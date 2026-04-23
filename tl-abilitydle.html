@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -196,17 +196,17 @@
   .attempts-display span { color: var(--gold); }
 
   /* Guess input */
-  .input-row { display: flex; gap: 8px; width: 100%; }
+  .input-row { position: relative; width: 100%; }
 
   .guess-input {
-    flex: 1;
+    width: 100%;
     background: var(--bg3);
     border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--text);
     font-family: 'Crimson Pro', serif;
     font-size: 17px;
-    padding: 12px 16px;
+    padding: 12px 52px 12px 16px;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
   }
@@ -216,18 +216,21 @@
   .guess-input:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .btn-guess {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
     background: linear-gradient(135deg, #3a2e12, #2a2208);
     border: 1px solid var(--gold-dim);
     color: var(--gold-light);
-    border-radius: 8px;
-    width: 48px;
-    height: 48px;
+    border-radius: 6px;
+    width: 38px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     transition: all 0.2s;
-    flex-shrink: 0;
   }
 
   .btn-guess:hover:not(:disabled) {
@@ -239,7 +242,7 @@
   .btn-guess:disabled { opacity: 0.4; cursor: not-allowed; }
 
   /* Autocomplete */
-  .autocomplete-wrap { position: relative; flex: 1; }
+  .autocomplete-wrap { position: relative; width: 100%; }
 
   .autocomplete-list {
     position: absolute;
@@ -490,6 +493,69 @@
     font-size: 14px;
   }
 
+  /* Hint badges */
+  .hint-badges {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .hint-badge {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 58px;
+    transition: border-color 0.3s, opacity 0.3s;
+  }
+
+  .hint-badge.revealed { border-color: var(--border-gold); }
+
+  @keyframes hintPop {
+    0%   { border-color: var(--gold); box-shadow: 0 0 14px rgba(201,168,76,0.4); }
+    100% { border-color: var(--border-gold); box-shadow: none; }
+  }
+  .hint-badge.hint-pop { animation: hintPop 0.7s ease forwards; }
+
+  .hint-badge-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  .hint-badge-val {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    color: var(--gold-light);
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  .hint-toggle-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-dim);
+    padding: 3px;
+    line-height: 0;
+    transition: color 0.2s;
+    border-radius: 3px;
+  }
+  .hint-toggle-btn:hover { color: var(--gold-light); }
+
   /* Scrollbar */
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
@@ -539,6 +605,19 @@
         <div class="skill-icon-frame"></div>
       </div>
       <div class="attempts-display">Attempts: <span id="attempt-count">0</span> / 6</div>
+
+      <div class="hint-badges">
+        <div class="hint-badge" id="hb-weapon">
+          <button class="hint-toggle-btn" id="ht-weapon" onclick="toggleHintPref('weapon')" title="Toggle weapon hint"></button>
+          <div class="hint-badge-label">Weapon</div>
+          <div class="hint-badge-val" id="hbv-weapon"></div>
+        </div>
+        <div class="hint-badge" id="hb-type">
+          <button class="hint-toggle-btn" id="ht-type" onclick="toggleHintPref('type')" title="Toggle type hint"></button>
+          <div class="hint-badge-label">Type</div>
+          <div class="hint-badge-val" id="hbv-type"></div>
+        </div>
+      </div>
     </div>
 
     <div style="width:100%">
@@ -555,7 +634,7 @@
           <div class="autocomplete-list" id="autocomplete-list"></div>
         </div>
         <button class="btn-guess" id="btn-guess" title="Submit guess">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="22" y1="2" x2="11" y2="13"/>
             <polygon points="22 2 15 22 11 13 2 9 22 2"/>
           </svg>
@@ -640,6 +719,244 @@
     'WraithsBeckon','WrathfulEdge','WreakHavoc','ZephyrsNock'
   ];
 
+  // ── Skill metadata (type + weapon per skill file key) ─────────
+  const SKILL_META = {
+    AShotAtVictory:{type:'Active',weapon:'Sword & Shield'},
+    AbyssalCleave:{type:'Active',weapon:'Spear'},
+    AegisShield:{type:'Passive',weapon:'Sword & Shield'},
+    Ambidexterity:{type:'Passive',weapon:'Crossbow'},
+    AnkleStrike:{type:'Active',weapon:'Daggers'},
+    AnnihilatingSlash:{type:'Active',weapon:'Sword & Shield'},
+    AnnihilationBarrageShot:{type:'Active',weapon:'Crossbow'},
+    AnnihilationBlade:{type:'Active',weapon:'Sword & Shield'},
+    ArrowVortex:{type:'Active',weapon:'Longbow'},
+    AscendingCleave:{type:'Active',weapon:'Spear'},
+    AscendingSlash:{type:'Active',weapon:'Greatsword'},
+    Asceticism:{type:'Passive',weapon:'Staff'},
+    AssassinationStance:{type:'Passive',weapon:'Daggers'},
+    AssassinsInstincts:{type:'Passive',weapon:'Daggers'},
+    AssassinsStep:{type:'Passive',weapon:'Daggers'},
+    BarbariansDash:{type:'Passive',weapon:'Greatsword'},
+    BasicShot:{type:'Common',weapon:'Crossbow / Longbow'},
+    BlessedBarrier:{type:'Active',weapon:'Wand & Tome'},
+    BlessingOfImmortality:{type:'Active',weapon:'Sword & Shield'},
+    Blitz:{type:'Active',weapon:'Longbow'},
+    BlockBlade:{type:'Defense',weapon:'Daggers'},
+    BloodDevotion:{type:'Active',weapon:'Greatsword'},
+    BloodleechAura:{type:'Active',weapon:'Spear'},
+    Bloodlust:{type:'Passive',weapon:'Crossbow / Daggers'},
+    BrutalArrow:{type:'Active',weapon:'Longbow'},
+    BrutalFury:{type:'Active',weapon:'Spear'},
+    BrutalIncision:{type:'Active',weapon:'Daggers'},
+    BurningSmokescreen:{type:'Active',weapon:'Staff'},
+    CamouflageCloak:{type:'Active',weapon:'Daggers'},
+    Cataclysm:{type:'Active',weapon:'Spear'},
+    ChainHook:{type:'Active',weapon:'Sword & Shield'},
+    ChainLightning:{type:'Active',weapon:'Staff'},
+    ChaoticShield:{type:'Defense',weapon:'Wand & Tome'},
+    ChargingSlash:{type:'Active',weapon:'Greatsword'},
+    ClaysSalvation:{type:'Active',weapon:'Wand & Tome'},
+    CleavingMoonlight:{type:'Active',weapon:'Daggers'},
+    CleavingRoar:{type:'Active',weapon:'Sword & Shield'},
+    ColdWarrior:{type:'Passive',weapon:'Greatsword'},
+    CollisionShot:{type:'Active',weapon:'Crossbow'},
+    ConcentratedBarrier:{type:'Active',weapon:'Sword & Shield'},
+    ConstrictingTempest:{type:'Active',weapon:'Spear'},
+    ControllingRake:{type:'Active',weapon:'Sword & Shield'},
+    CorruptNail:{type:'Passive',weapon:'Crossbow'},
+    CorruptedMagicCircle:{type:'Active',weapon:'Wand & Tome'},
+    CounterBarrier:{type:'Active',weapon:'Sword & Shield'},
+    CruelSmite:{type:'Active',weapon:'Greatsword'},
+    CullingArc:{type:'Active',weapon:'Spear'},
+    CurseExplosion:{type:'Active',weapon:'Wand & Tome'},
+    CursedNightmare:{type:'Active',weapon:'Wand & Tome'},
+    CyclonicFury:{type:'Active',weapon:'Spear'},
+    DaVincisChill:{type:'Active',weapon:'Greatsword'},
+    DaVincisCourage:{type:'Active',weapon:'Greatsword'},
+    DeadlyMarker:{type:'Active',weapon:'Longbow'},
+    DeathBlow:{type:'Active',weapon:'Greatsword'},
+    DeathFromAbove:{type:'Active',weapon:'Spear'},
+    DeathKnell:{type:'Passive',weapon:'Spear'},
+    DecayingTouch:{type:'Active',weapon:'Wand & Tome'},
+    DecisiveBombardment:{type:'Active',weapon:'Longbow'},
+    DecisiveSniping:{type:'Active',weapon:'Longbow'},
+    DesperateClash:{type:'Active',weapon:'Sword & Shield'},
+    DestructiveFang:{type:'Passive',weapon:'Daggers'},
+    Detection:{type:'Passive',weapon:'Crossbow'},
+    DetonationMark:{type:'Active',weapon:'Crossbow'},
+    DevastatingSmash:{type:'Active',weapon:'Greatsword'},
+    DevastatingTornado:{type:'Active',weapon:'Greatsword'},
+    DevotedSanctuary:{type:'Active',weapon:'Greatsword'},
+    DevotedShield:{type:'Passive',weapon:'Longbow'},
+    DevotionAndEmptiness:{type:'Passive',weapon:'Wand & Tome'},
+    DistortedSanctuary:{type:'Passive',weapon:'Longbow'},
+    DoubleSlash:{type:'Common',weapon:'Greatsword'},
+    EagleVision:{type:'Passive',weapon:'Crossbow'},
+    EarthsBlessing:{type:'Passive',weapon:'Longbow'},
+    EchoicBarrier:{type:'Passive',weapon:'Staff'},
+    EnchantingTime:{type:'Active',weapon:'Wand & Tome'},
+    Enforcer:{type:'Active',weapon:'Spear'},
+    EnsnaringArrow:{type:'Active',weapon:'Longbow'},
+    ExplosiveFury:{type:'Active',weapon:'Spear'},
+    ExplosiveTrap:{type:'Active',weapon:'Crossbow'},
+    FatalPrecision:{type:'Passive',weapon:'Spear'},
+    FatalStigma:{type:'Active',weapon:'Daggers'},
+    FierceClash:{type:'Active',weapon:'Sword & Shield'},
+    FireballBarrage:{type:'Active',weapon:'Staff'},
+    FlameCondensation:{type:'Passive',weapon:'Staff'},
+    FlamingArc:{type:'Active',weapon:'Spear'},
+    FlashArrow:{type:'Active',weapon:'Longbow'},
+    FlashWave:{type:'Active',weapon:'Longbow'},
+    FocusedFireBombs:{type:'Active',weapon:'Staff'},
+    ForbiddenSanctuary:{type:'Passive',weapon:'Staff'},
+    FountainOfLife:{type:'Active',weapon:'Wand & Tome'},
+    FrenziedLightningWave:{type:'Active',weapon:'Staff'},
+    FrenziedSwordDance:{type:'Active',weapon:'Daggers'},
+    FrostCleaving:{type:'Active',weapon:'Greatsword'},
+    FrostMaster:{type:'Passive',weapon:'Staff'},
+    FrostSmokescreen:{type:'Active',weapon:'Staff'},
+    FullOfCorruption:{type:'Passive',weapon:'Wand & Tome'},
+    GaiaCrash:{type:'Active',weapon:'Greatsword'},
+    GaleRush:{type:'Active',weapon:'Spear'},
+    GeradsPatience:{type:'Passive',weapon:'Sword & Shield'},
+    GreatFury:{type:'Active',weapon:'Sword & Shield'},
+    GuildBlessingAbyss:{type:'Guild',weapon:'—'},
+    GuildBlessingEXP:{type:'Guild',weapon:'—'},
+    GuildBlessingSollant:{type:'Guild',weapon:'—'},
+    GuildResurrectionStone:{type:'Guild',weapon:'—'},
+    GuildSummonGate:{type:'Guild',weapon:'—'},
+    GuildTacticsBossBonusDamage:{type:'Guild',weapon:'—'},
+    GuildTacticsBossDamageReduction:{type:'Guild',weapon:'—'},
+    GuildTacticsCooldownSpeed:{type:'Guild',weapon:'—'},
+    GuildTacticsManaRegen:{type:'Guild',weapon:'—'},
+    GuildTacticsMoveSpeed:{type:'Guild',weapon:'—'},
+    GuildTacticsRange:{type:'Guild',weapon:'—'},
+    GuillotineBlade:{type:'Active',weapon:'Greatsword'},
+    HealingTouch:{type:'Active',weapon:'Longbow'},
+    HellfireRain:{type:'Active',weapon:'Staff'},
+    HighFocus:{type:'Active',weapon:'Staff'},
+    IceSpear:{type:'Active',weapon:'Staff'},
+    IceSpearBombardment:{type:'Active',weapon:'Staff'},
+    IceTornado:{type:'Active',weapon:'Greatsword'},
+    IceboundArmor:{type:'Active',weapon:'Staff'},
+    IceboundTomb:{type:'Active',weapon:'Staff'},
+    ImmortalPride:{type:'Active',weapon:'Sword & Shield'},
+    Impenetrable:{type:'Passive',weapon:'Sword & Shield'},
+    ImposingForm:{type:'Passive',weapon:'Spear'},
+    IndomitableArmor:{type:'Passive',weapon:'Greatsword'},
+    InfernalMeteor:{type:'Active',weapon:'Staff'},
+    InfernoWave:{type:'Active',weapon:'Staff'},
+    InjectVenom:{type:'Active',weapon:'Daggers'},
+    InnerPeace:{type:'Active',weapon:'Staff'},
+    InvincibleWall:{type:'Active',weapon:'Wand & Tome'},
+    IronPointParry:{type:'Defense',weapon:'Greatsword'},
+    JanicesRage:{type:'Active',weapon:'Wand & Tome'},
+    JavelinInferno:{type:'Active',weapon:'Spear'},
+    JavelinSurge:{type:'Active',weapon:'Spear'},
+    JudgmentLightning:{type:'Active',weapon:'Staff'},
+    JumpingChain:{type:'Active',weapon:'Staff'},
+    KarmicHaze:{type:'Active',weapon:'Wand & Tome'},
+    KnifeThrowing:{type:'Active',weapon:'Daggers'},
+    LightningInfusion:{type:'Active',weapon:'Daggers'},
+    LightningThrow:{type:'Active',weapon:'Daggers'},
+    LimitBreak:{type:'Active',weapon:'Longbow'},
+    MadSwordDance:{type:'Active',weapon:'Daggers'},
+    MagicOrb:{type:'Common',weapon:'Wand & Tome / Staff'},
+    MaliceSurge:{type:'Passive',weapon:'Spear'},
+    ManaAmp:{type:'Passive',weapon:'Staff'},
+    ManaExchange:{type:'Active',weapon:'Crossbow'},
+    ManaballEruption:{type:'Passive',weapon:'Staff'},
+    MercilessBarrage:{type:'Active',weapon:'Crossbow'},
+    MoraleBoost:{type:'Passive',weapon:'Sword & Shield'},
+    MortalMark:{type:'Active',weapon:'Crossbow'},
+    MortalWrath:{type:'Passive',weapon:'Spear'},
+    MotherNaturesProtest:{type:'Active',weapon:'Crossbow'},
+    MultiShot:{type:'Active',weapon:'Crossbow'},
+    MurderousEnergy:{type:'Passive',weapon:'Daggers'},
+    Mutilation:{type:'Common',weapon:'Daggers'},
+    MysticShield:{type:'Defense',weapon:'Staff'},
+    NaturesBlessing:{type:'Active',weapon:'Longbow'},
+    NaturesPower:{type:'Passive',weapon:'Crossbow'},
+    NimbleLeap:{type:'Active',weapon:'Crossbow'},
+    NimbleSteps:{type:'Passive',weapon:'Spear'},
+    NobleRevival:{type:'Passive',weapon:'Wand & Tome'},
+    Overtaker:{type:'Defense',weapon:'Longbow'},
+    PatientBlock:{type:'Defense',weapon:'Spear'},
+    PhantomSmokescreen:{type:'Active',weapon:'Daggers'},
+    PhoenixBarrage:{type:'Active',weapon:'Spear'},
+    PiercingStrike:{type:'Active',weapon:'Sword & Shield / Crossbow'},
+    PrecisionDash:{type:'Active',weapon:'Greatsword'},
+    ProvokingRoar:{type:'Active',weapon:'Sword & Shield'},
+    PurifyingTouch:{type:'Active',weapon:'Longbow'},
+    QuickFire:{type:'Active',weapon:'Crossbow'},
+    RagingFrenzy:{type:'Passive',weapon:'Greatsword'},
+    RapidShot:{type:'Active',weapon:'Crossbow'},
+    RapidfireStance:{type:'Passive',weapon:'Longbow'},
+    RayOfDisaster:{type:'Active',weapon:'Wand & Tome'},
+    RecoilShot:{type:'Active',weapon:'Crossbow'},
+    RedemptiveBarrier:{type:'Active',weapon:'Staff'},
+    ResilientMind:{type:'Passive',weapon:'Sword & Shield'},
+    RetaliatoryStrike:{type:'Passive',weapon:'Spear'},
+    RisingSlash:{type:'Active',weapon:'Spear'},
+    RobustConstitution:{type:'Passive',weapon:'Greatsword'},
+    RoxiesArrowhead:{type:'Passive',weapon:'Longbow'},
+    RupturingParry:{type:'Defense',weapon:'Crossbow'},
+    SaintsOath:{type:'Passive',weapon:'Wand & Tome'},
+    SalvationChain:{type:'Active',weapon:'Staff'},
+    SelflessDiffusion:{type:'Active',weapon:'Crossbow'},
+    SelflessSoul:{type:'Passive',weapon:'Wand & Tome'},
+    SentinelsBastion:{type:'Active',weapon:'Spear'},
+    SerialFireBombs:{type:'Active',weapon:'Staff'},
+    ShadowStrike:{type:'Active',weapon:'Daggers'},
+    ShadowWalker:{type:'Passive',weapon:'Daggers'},
+    ShieldStrike:{type:'Active',weapon:'Sword & Shield'},
+    ShieldSurvivalTechnique:{type:'Defense',weapon:'Sword & Shield'},
+    ShieldThrow:{type:'Active',weapon:'Sword & Shield'},
+    SkillfulEvasion:{type:'Passive',weapon:'Sword & Shield'},
+    Slash:{type:'Common',weapon:'Sword & Shield'},
+    SlaughteringSlash:{type:'Active',weapon:'Spear'},
+    SnipersSense:{type:'Passive',weapon:'Longbow'},
+    SpectrumOfAgony:{type:'Passive',weapon:'Sword & Shield'},
+    StalwartBastion:{type:'Active',weapon:'Sword & Shield'},
+    SteadyAim:{type:'Passive',weapon:'Longbow'},
+    Strafing:{type:'Active',weapon:'Longbow'},
+    StrategicRush:{type:'Active',weapon:'Sword & Shield'},
+    StunningBlow:{type:'Active',weapon:'Greatsword'},
+    SwiftHealing:{type:'Active',weapon:'Wand & Tome'},
+    Swing:{type:'Common',weapon:'Spear'},
+    TempestStrike:{type:'Active',weapon:'Spear'},
+    ThunderSpirit:{type:'Active',weapon:'Daggers'},
+    ThunderingBomb:{type:'Active',weapon:'Daggers'},
+    ThundersBlessing:{type:'Active',weapon:'Staff'},
+    TimeForPunishment:{type:'Active',weapon:'Wand & Tome'},
+    Tornado:{type:'Active',weapon:'Longbow'},
+    TouchOfDespair:{type:'Active',weapon:'Wand & Tome'},
+    TranscendingPowerEclipse:{type:'Transcendence',weapon:'—'},
+    TranscendingPowerGale:{type:'Transcendence',weapon:'—'},
+    TranscendingPowerHeavyRain:{type:'Transcendence',weapon:'—'},
+    UmbralSpirit:{type:'Active',weapon:'Daggers'},
+    UnyieldingSentinel:{type:'Active',weapon:'Spear'},
+    ValiantBrawl:{type:'Active',weapon:'Greatsword'},
+    ValorousBarrier:{type:'Active',weapon:'Wand & Tome'},
+    VampiricContract:{type:'Passive',weapon:'Wand & Tome'},
+    VampiricStrike:{type:'Active',weapon:'Daggers'},
+    ViciousFury:{type:'Active',weapon:'Spear'},
+    VictoriousEnergy:{type:'Active',weapon:'Staff'},
+    VictorsMorale:{type:'Passive',weapon:'Greatsword'},
+    VitalForce:{type:'Passive',weapon:'Greatsword'},
+    WaveShot:{type:'Active',weapon:'Crossbow'},
+    WeakPointShot:{type:'Active',weapon:'Crossbow'},
+    WhirlingShield:{type:'Active',weapon:'Sword & Shield'},
+    Willbreaker:{type:'Active',weapon:'Greatsword'},
+    WindSnatcher:{type:'Active',weapon:'Crossbow'},
+    WitchingHour:{type:'Active',weapon:'Wand & Tome'},
+    WittyRetort:{type:'Active',weapon:'Sword & Shield'},
+    WraithsBeckon:{type:'Passive',weapon:'Wand & Tome'},
+    WrathfulEdge:{type:'Passive',weapon:'Daggers'},
+    WreakHavoc:{type:'Active',weapon:'Spear'},
+    ZephyrsNock:{type:'Active',weapon:'Longbow'},
+  };
+
   function fileToSkillName(f) {
     let n = f.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
     n = n.replace(/([a-z])([A-Z])/g, '$1 $2');
@@ -683,6 +1000,7 @@
     state: 'abilitydle_state',
     stats: 'abilitydle_stats',
     log:   'abilitydle_log',
+    hints: 'abilitydle_hints',
   };
 
   function loadState() {
@@ -782,6 +1100,8 @@
     document.getElementById('btn-guess').disabled = gameOver;
     document.getElementById('guess-input').focus();
 
+    hintPrefs = loadHintPrefs();
+    renderSkillHints(false);
     renderLog();
     startCountdown();
   }
@@ -818,6 +1138,7 @@
     }
 
     saveState({ guesses: guesses.map(g => ({ name: g.name, correct: g.correct })), gameOver: false });
+    renderSkillHints(true);
 
     if (correct) {
       img.className = '';
@@ -869,6 +1190,7 @@
     document.getElementById('guess-input').disabled = true;
     document.getElementById('btn-guess').disabled = true;
 
+    renderSkillHints(false);
     showResult(won, guesses.length);
     renderLog();
   }
@@ -890,6 +1212,64 @@
     document.getElementById('stat-wins').textContent = stats.wins;
     document.getElementById('stat-streak').textContent = stats.streak;
     document.getElementById('stat-max-streak').textContent = stats.maxStreak || 0;
+  }
+
+  // ── Hints ─────────────────────────────────────────────────────
+  // Hint badges
+  let hintPrefs = { weapon: false, type: false };
+
+  function loadHintPrefs() {
+    try { return JSON.parse(localStorage.getItem(SK.hints)) || { weapon: false, type: false }; }
+    catch { return { weapon: false, type: false }; }
+  }
+
+  function saveHintPrefs() { localStorage.setItem(SK.hints, JSON.stringify(hintPrefs)); }
+
+  function toggleHintPref(key) {
+    hintPrefs[key] = !hintPrefs[key];
+    saveHintPrefs();
+    renderSkillHints(false);
+  }
+
+  const EYE_OPEN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const EYE_CLOSED = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+  function renderSkillHints(animate) {
+    const meta = SKILL_META[getTodaySkill().file] || {};
+    updateBadge('weapon', meta.weapon || '—', 3, animate);
+    updateBadge('type',   meta.type   || '—', 5, animate);
+  }
+
+  function updateBadge(key, value, threshold, animate) {
+    const badge  = document.getElementById('hb-' + key);
+    const valEl  = document.getElementById('hbv-' + key);
+    const btn    = document.getElementById('ht-' + key);
+    const enabled = hintPrefs[key];
+    const n = guesses.length;
+
+    btn.innerHTML = enabled ? EYE_OPEN : EYE_CLOSED;
+    btn.style.color = enabled ? '' : 'var(--border)';
+
+    if (!enabled) {
+      badge.classList.remove('revealed', 'hint-pop');
+      badge.style.opacity = '0.4';
+      valEl.innerHTML = '<span style="color:var(--text-dim);font-size:14px;font-family:Crimson Pro,serif;">Disabled</span>';
+      return;
+    }
+
+    badge.style.opacity = '';
+
+    if (n >= threshold || gameOver) {
+      valEl.textContent = value;
+      if (!badge.classList.contains('revealed')) {
+        badge.classList.add('revealed');
+        if (animate) { badge.classList.remove('hint-pop'); void badge.offsetWidth; badge.classList.add('hint-pop'); }
+      }
+    } else {
+      badge.classList.remove('revealed');
+      const rem = threshold - n;
+      valEl.innerHTML = '<span style="color:var(--text);font-size:15px;font-family:Crimson Pro,serif;">After ' + rem + ' more guess' + (rem !== 1 ? 'es' : '') + '</span>';
+    }
   }
 
   // ── Countdown ─────────────────────────────────────────────────
