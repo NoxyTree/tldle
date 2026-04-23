@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TLdle — Ability</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim: #7a6230;
+    --bg: #0a0b0f;
+    --bg2: #111318;
+    --bg3: #181c24;
+    --border: #2a2e3a;
+    --border-gold: #3d3520;
+    --text: #d4cfc4;
+    --text-dim: #6b6560;
+    --green: #2d6e4e;
+    --green-light: #4caf80;
+    --red: #6e2d2d;
+    --red-light: #c45c5c;
+    --correct-bg: #1a3d2e;
+    --wrong-bg: #2a1a1a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(60,40,120,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 60% at 80% 60%, rgba(120,40,40,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+    padding: 0 16px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  header {
+    text-align: center;
+    padding: 32px 0 8px;
+    width: 100%;
+  }
+
+  .logo {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(180deg, #f0d97a 0%, #c9a84c 45%, #8a6820 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    filter: drop-shadow(0 2px 8px rgba(201,168,76,0.3));
+  }
+
+  .logo span {
+    font-size: 26px;
+    font-weight: 400;
+    display: block;
+    letter-spacing: 8px;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  .divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 8px auto 0;
+  }
+
+  /* Date / countdown row */
+  .date-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .date-row .date-sep { color: var(--gold-dim); }
+
+  .countdown-label { color: var(--text-dim); }
+  #countdown { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+  /* Game screen */
+  #game-screen { width: 100%; display: none; flex-direction: column; align-items: center; gap: 16px; }
+
+  /* Skill display card */
+  .skill-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .skill-card h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .skill-icon-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 16px;
+  }
+
+  .skill-icon-frame {
+    position: absolute;
+    inset: -6px;
+    border: 2px solid var(--gold-dim);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  .skill-icon-frame::before, .skill-icon-frame::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .skill-icon-frame::before { top: -4px; left: -4px; }
+  .skill-icon-frame::after { bottom: -4px; right: -4px; }
+
+  #skill-img {
+    width: 110px;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 4px;
+    display: block;
+    transition: filter 0.5s ease;
+  }
+
+  #skill-img.blurred { filter: blur(12px) brightness(0.6); }
+
+  .attempts-display {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .attempts-display span { color: var(--gold); }
+
+  /* Guess input */
+  .input-row { display: flex; gap: 8px; width: 100%; }
+
+  .guess-input {
+    flex: 1;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    padding: 12px 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .guess-input:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 2px rgba(201,168,76,0.1); }
+  .guess-input::placeholder { color: var(--text-dim); }
+  .guess-input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-guess {
+    background: linear-gradient(135deg, #3a2e12, #2a2208);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold-light);
+    border-radius: 8px;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+
+  .btn-guess:hover:not(:disabled) {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, #4a3e1a, #3a3010);
+    box-shadow: 0 0 16px rgba(201,168,76,0.2);
+  }
+
+  .btn-guess:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Autocomplete */
+  .autocomplete-wrap { position: relative; flex: 1; }
+
+  .autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 100;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  .autocomplete-list.open { display: block; }
+
+  .autocomplete-item {
+    padding: 10px 14px;
+    cursor: pointer;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.1s;
+  }
+
+  .autocomplete-item:hover, .autocomplete-item.active { background: var(--bg3); color: var(--gold-light); }
+
+  .autocomplete-item img {
+    width: 28px;
+    height: 28px;
+    object-fit: cover;
+    border-radius: 3px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  .autocomplete-item span { flex: 1; }
+
+  /* Guesses list */
+  .guesses-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    align-self: flex-start;
+  }
+
+  .guesses-list { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+
+  .guess-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    animation: slideIn 0.25s ease;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .guess-row.correct { border-color: var(--green); background: var(--correct-bg); }
+  .guess-row.wrong { border-color: var(--border); background: var(--wrong-bg); }
+
+  .guess-row img {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .guess-name { flex: 1; font-size: 16px; font-weight: 600; }
+  .guess-row.correct .guess-name { color: var(--green-light); }
+  .guess-row.wrong .guess-name { color: var(--text-dim); }
+  .guess-result-icon { font-size: 18px; flex-shrink: 0; }
+
+  /* Result banner */
+  .result-banner {
+    width: 100%;
+    background: var(--bg2);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+    display: none;
+  }
+
+  .result-banner.win { border-color: var(--green); background: var(--correct-bg); }
+  .result-banner.lose { border-color: var(--red); background: var(--wrong-bg); }
+
+  .result-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .result-banner.win::before { background: linear-gradient(90deg, transparent, var(--green-light), transparent); }
+  .result-banner.lose::before { background: linear-gradient(90deg, transparent, var(--red-light), transparent); }
+
+  .result-title {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .result-banner.win .result-title { color: var(--green-light); }
+  .result-banner.lose .result-title { color: var(--red-light); }
+
+  .result-answer { font-size: 17px; color: var(--text); margin-bottom: 14px; }
+  .result-answer strong { color: var(--gold-light); font-family: 'Cinzel', serif; }
+
+  .result-next {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .result-next span { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+  /* Stats row */
+  .stats-row { display: flex; gap: 16px; width: 100%; }
+
+  .stat-box {
+    flex: 1;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    text-align: center;
+  }
+
+  .stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat-label { font-size: 11px; color: var(--text-dim); letter-spacing: 1px; text-transform: uppercase; }
+  .stats-row .stat-box { min-width: 0; }
+
+  /* History / Log */
+  .log-section {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .log-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 18px;
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .log-toggle:hover { color: var(--gold-light); }
+
+  .log-toggle-label { flex: 1; text-align: left; }
+
+  .log-count-badge {
+    font-size: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 7px;
+    color: var(--text-dim);
+  }
+
+  .log-chevron {
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+
+  .log-chevron.open { transform: rotate(180deg); }
+
+  .log-body {
+    display: none;
+    border-top: 1px solid var(--border);
+    max-height: 320px;
+    overflow-y: auto;
+  }
+
+  .log-body.open { display: block; }
+
+  .log-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 18px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .log-entry:last-child { border-bottom: none; }
+
+  .log-date {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    flex-shrink: 0;
+    min-width: 90px;
+  }
+
+  .log-skill { flex: 1; color: var(--text); }
+
+  .log-result {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .log-result.win { color: var(--green-light); }
+  .log-result.lose { color: var(--red-light); }
+
+  .log-empty {
+    padding: 20px;
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 14px;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="logo">TLdle<span>· Ability ·</span></div>
+    <div class="divider"></div>
+  </header>
+
+  <div id="game-screen">
+
+    <div class="date-row">
+      <span id="today-date"></span>
+      <span class="date-sep">·</span>
+      <span class="countdown-label">Next: <span id="countdown">--:--:--</span></span>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-value" id="stat-played">0</div>
+        <div class="stat-label">Played</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="stat-wins">0</div>
+        <div class="stat-label">Wins</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="stat-streak">0</div>
+        <div class="stat-label">Streak</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-value" id="stat-max-streak">0</div>
+        <div class="stat-label">Best</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <h2>Which ability is this?</h2>
+      <div class="skill-icon-wrap">
+        <img id="skill-img" src="" alt="Skill icon" class="blurred">
+        <div class="skill-icon-frame"></div>
+      </div>
+      <div class="attempts-display">Attempts: <span id="attempt-count">0</span> / 6</div>
+    </div>
+
+    <div style="width:100%">
+      <div class="input-row">
+        <div class="autocomplete-wrap">
+          <input
+            class="guess-input"
+            id="guess-input"
+            type="text"
+            placeholder="Type ability name..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <div class="autocomplete-list" id="autocomplete-list"></div>
+        </div>
+        <button class="btn-guess" id="btn-guess" title="Submit guess">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="result-banner" id="result-banner">
+      <div class="result-title" id="result-title"></div>
+      <div class="result-answer" id="result-answer"></div>
+      <div class="result-next">Next ability in <span id="result-countdown">--:--:--</span></div>
+    </div>
+
+    <div class="guesses-list" id="guesses-list"></div>
+
+    <div class="log-section">
+      <button class="log-toggle" onclick="toggleLog()">
+        <span class="log-toggle-label">History</span>
+        <span class="log-count-badge" id="log-count-badge">0 games</span>
+        <svg class="log-chevron" id="log-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="log-body" id="log-body">
+        <div class="log-empty">No games recorded yet.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Skill manifest ────────────────────────────────────────────
+  // Weapon Mastery and Morph types excluded
+  const SKILL_FILES = [
+    'AShotAtVictory','AbyssalCleave','AegisShield','Ambidexterity','AnkleStrike',
+    'AnnihilatingSlash','AnnihilationBarrageShot','AnnihilationBlade','ArrowVortex','AscendingCleave',
+    'AscendingSlash','Asceticism','AssassinationStance','AssassinsInstincts','AssassinsStep',
+    'BarbariansDash','BasicShot','BlessedBarrier','BlessingOfImmortality','Blitz',
+    'BlockBlade','BloodDevotion','BloodleechAura','Bloodlust','BrutalArrow',
+    'BrutalFury','BrutalIncision','BurningSmokescreen','CamouflageCloak','Cataclysm',
+    'ChainHook','ChainLightning','ChaoticShield','ChargingSlash','ClaysSalvation',
+    'CleavingMoonlight','CleavingRoar','ColdWarrior','CollisionShot','ConcentratedBarrier',
+    'ConstrictingTempest','ControllingRake','CorruptNail','CorruptedMagicCircle','CounterBarrier',
+    'CruelSmite','CullingArc','CurseExplosion','CursedNightmare','CyclonicFury',
+    'DaVincisChill','DaVincisCourage','DeadlyMarker','DeathBlow','DeathFromAbove',
+    'DeathKnell','DecayingTouch','DecisiveBombardment','DecisiveSniping','DesperateClash',
+    'DestructiveFang','Detection','DetonationMark','DevastatingSmash','DevastatingTornado',
+    'DevotedSanctuary','DevotedShield','DevotionAndEmptiness','DistortedSanctuary','DoubleSlash',
+    'EagleVision','EarthsBlessing','EchoicBarrier','EnchantingTime','Enforcer',
+    'EnsnaringArrow','ExplosiveFury','ExplosiveTrap','FatalPrecision','FatalStigma',
+    'FierceClash','FireballBarrage','FlameCondensation','FlamingArc','FlashArrow',
+    'FlashWave','FocusedFireBombs','ForbiddenSanctuary','FountainOfLife','FrenziedLightningWave',
+    'FrenziedSwordDance','FrostCleaving','FrostMaster','FrostSmokescreen','FullOfCorruption',
+    'GaiaCrash','GaleRush','GeradsPatience','GreatFury','GuildBlessingAbyss',
+    'GuildBlessingEXP','GuildBlessingSollant','GuildResurrectionStone','GuildSummonGate','GuildTacticsBossBonusDamage',
+    'GuildTacticsBossDamageReduction','GuildTacticsCooldownSpeed','GuildTacticsManaRegen','GuildTacticsMoveSpeed','GuildTacticsRange',
+    'GuillotineBlade','HealingTouch','HellfireRain','HighFocus','IceSpear',
+    'IceSpearBombardment','IceTornado','IceboundArmor','IceboundTomb','ImmortalPride',
+    'Impenetrable','ImposingForm','IndomitableArmor','InfernalMeteor','InfernoWave',
+    'InjectVenom','InnerPeace','InvincibleWall','IronPointParry','JanicesRage',
+    'JavelinInferno','JavelinSurge','JudgmentLightning','JumpingChain','KarmicHaze',
+    'KnifeThrowing','LightningInfusion','LightningThrow','LimitBreak','MadSwordDance',
+    'MagicOrb','MaliceSurge','ManaAmp','ManaExchange','ManaballEruption',
+    'MercilessBarrage','MoraleBoost','MortalMark','MortalWrath','MotherNaturesProtest',
+    'MultiShot','MurderousEnergy','Mutilation','MysticShield','NaturesBlessing',
+    'NaturesPower','NimbleLeap','NimbleSteps','NobleRevival','Overtaker',
+    'PatientBlock','PhantomSmokescreen','PhoenixBarrage','PiercingStrike','PrecisionDash',
+    'ProvokingRoar','PurifyingTouch','QuickFire','RagingFrenzy','RapidShot',
+    'RapidfireStance','RayOfDisaster','RecoilShot','RedemptiveBarrier','ResilientMind',
+    'RetaliatoryStrike','RisingSlash','RobustConstitution','RoxiesArrowhead','RupturingParry',
+    'SaintsOath','SalvationChain','SelflessDiffusion','SelflessSoul','SentinelsBastion',
+    'SerialFireBombs','ShadowStrike','ShadowWalker','ShieldStrike','ShieldSurvivalTechnique',
+    'ShieldThrow','SkillfulEvasion','Slash','SlaughteringSlash','SnipersSense',
+    'SpectrumOfAgony','StalwartBastion','SteadyAim','Strafing','StrategicRush',
+    'StunningBlow','SwiftHealing','Swing','TempestStrike','ThunderSpirit',
+    'ThunderingBomb','ThundersBlessing','TimeForPunishment','Tornado','TouchOfDespair',
+    'TranscendingPowerEclipse','TranscendingPowerGale','TranscendingPowerHeavyRain','UmbralSpirit','UnyieldingSentinel',
+    'ValiantBrawl','ValorousBarrier','VampiricContract','VampiricStrike','ViciousFury',
+    'VictoriousEnergy','VictorsMorale','VitalForce','WaveShot','WeakPointShot',
+    'WhirlingShield','Willbreaker','WindSnatcher','WitchingHour','WittyRetort',
+    'WraithsBeckon','WrathfulEdge','WreakHavoc','ZephyrsNock'
+  ];
+
+  function fileToSkillName(f) {
+    let n = f.replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
+    n = n.replace(/([a-z])([A-Z])/g, '$1 $2');
+    n = n.replace(/\s+/g, ' ').trim();
+    n = n.replace(/\b\w/g, c => c.toUpperCase());
+    return n;
+  }
+
+  // Build skills array sorted alphabetically by display name
+  const skills = SKILL_FILES
+    .map(f => ({ file: f, name: fileToSkillName(f), url: `Skills/${f}.webp` }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  // ── Daily index ───────────────────────────────────────────────
+  const EPOCH = new Date('2026-01-01T00:00:00');
+
+  function getTodayStr() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function getYesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+
+  function getDayIndex() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const days = Math.floor((today - EPOCH) / 86400000);
+    return ((days % skills.length) + skills.length) % skills.length;
+  }
+
+  function getTodaySkill() {
+    return skills[getDayIndex()];
+  }
+
+  // ── Persistence ───────────────────────────────────────────────
+  const SK = {
+    state: 'abilitydle_state',
+    stats: 'abilitydle_stats',
+    log:   'abilitydle_log',
+  };
+
+  function loadState() {
+    try {
+      const s = JSON.parse(localStorage.getItem(SK.state));
+      return s && s.date === getTodayStr() ? s : null;
+    } catch { return null; }
+  }
+
+  function saveState(patch) {
+    const cur = loadState() || { date: getTodayStr(), guesses: [], gameOver: false, won: false };
+    localStorage.setItem(SK.state, JSON.stringify({ ...cur, ...patch, date: getTodayStr() }));
+  }
+
+  function loadStats() {
+    try { return JSON.parse(localStorage.getItem(SK.stats)) || { played: 0, wins: 0, streak: 0, maxStreak: 0, lastWonDate: null }; }
+    catch { return { played: 0, wins: 0, streak: 0, maxStreak: 0, lastWonDate: null }; }
+  }
+
+  function saveStats(s) { localStorage.setItem(SK.stats, JSON.stringify(s)); }
+
+  function getLog() {
+    try { return JSON.parse(localStorage.getItem(SK.log)) || []; }
+    catch { return []; }
+  }
+
+  function appendLog(entry) {
+    const log = getLog().filter(e => e.date !== entry.date);
+    log.unshift(entry);
+    localStorage.setItem(SK.log, JSON.stringify(log.slice(0, 365)));
+  }
+
+  // ── Game state ────────────────────────────────────────────────
+  let guesses = [];
+  let gameOver = false;
+  let stats = { played: 0, wins: 0, streak: 0 };
+  const MAX_GUESSES = 6;
+
+  function init() {
+    const gs = document.getElementById('game-screen');
+    gs.style.display = 'flex';
+
+    stats = loadStats();
+
+    // Reset streak if the player missed yesterday (and hasn't played today yet)
+    const todayStr = getTodayStr();
+    const yesterdayStr = getYesterdayStr();
+    if (
+      stats.streak > 0 &&
+      stats.lastWonDate !== todayStr &&
+      stats.lastWonDate !== yesterdayStr
+    ) {
+      stats.streak = 0;
+      saveStats(stats);
+    }
+
+    updateStats();
+
+    const today = new Date();
+    document.getElementById('today-date').textContent =
+      today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase();
+
+    const skill = getTodaySkill();
+    const img = document.getElementById('skill-img');
+    img.src = skill.url;
+
+    const state = loadState();
+    guesses = [];
+    gameOver = false;
+
+    if (state && state.guesses.length) {
+      state.guesses.forEach(g => {
+        const s = skills.find(x => x.name === g.name) || { name: g.name, url: `Skills/${g.name}.webp` };
+        guesses.push({ ...s, correct: g.correct });
+        addGuessRow(s, g.correct);
+      });
+
+      document.getElementById('attempt-count').textContent = guesses.length;
+
+      const blur = Math.max(0, 12 - guesses.length * 2);
+      if (blur <= 0 || state.gameOver) {
+        img.className = '';
+        img.style.filter = '';
+      } else {
+        img.style.filter = `blur(${blur}px) brightness(${0.6 + guesses.length * 0.07})`;
+      }
+
+      if (state.gameOver) {
+        gameOver = true;
+        showResult(state.won, state.guesses.length);
+      }
+    } else {
+      img.className = 'blurred';
+    }
+
+    document.getElementById('guess-input').disabled = gameOver;
+    document.getElementById('btn-guess').disabled = gameOver;
+    document.getElementById('guess-input').focus();
+
+    renderLog();
+    startCountdown();
+  }
+
+  function submitGuess() {
+    if (gameOver) return;
+    const input = document.getElementById('guess-input');
+    const val = input.value.trim();
+    if (!val) return;
+
+    const match = skills.find(s => s.name.toLowerCase() === val.toLowerCase());
+    if (!match) { shake(input); return; }
+
+    if (guesses.some(g => g.name.toLowerCase() === match.name.toLowerCase())) {
+      input.value = '';
+      return;
+    }
+
+    const correct = match.name.toLowerCase() === getTodaySkill().name.toLowerCase();
+    guesses.push({ ...match, correct });
+
+    addGuessRow(match, correct);
+    document.getElementById('attempt-count').textContent = guesses.length;
+    input.value = '';
+    document.getElementById('autocomplete-list').classList.remove('open');
+
+    const blur = Math.max(0, 12 - guesses.length * 2);
+    const img = document.getElementById('skill-img');
+    if (blur <= 0) {
+      img.className = '';
+      img.style.filter = '';
+    } else {
+      img.style.filter = `blur(${blur}px) brightness(${0.6 + guesses.length * 0.07})`;
+    }
+
+    saveState({ guesses: guesses.map(g => ({ name: g.name, correct: g.correct })), gameOver: false });
+
+    if (correct) {
+      img.className = '';
+      img.style.filter = '';
+      endGame(true);
+    } else if (guesses.length >= MAX_GUESSES) {
+      img.className = '';
+      img.style.filter = '';
+      endGame(false);
+    }
+  }
+
+  function addGuessRow(skill, correct) {
+    const list = document.getElementById('guesses-list');
+    const row = document.createElement('div');
+    row.className = `guess-row ${correct ? 'correct' : 'wrong'}`;
+    row.innerHTML = `
+      <img src="${skill.url}" alt="${skill.name}">
+      <span class="guess-name">${skill.name}</span>
+      <span class="guess-result-icon">${correct ? '✦' : '✕'}</span>
+    `;
+    list.prepend(row);
+  }
+
+  function endGame(won) {
+    gameOver = true;
+    stats.played++;
+    if (won) {
+      stats.wins++;
+      stats.streak = stats.lastWonDate === getYesterdayStr() ? stats.streak + 1 : 1;
+      stats.lastWonDate = getTodayStr();
+      stats.maxStreak = Math.max(stats.maxStreak || 0, stats.streak);
+    } else {
+      stats.streak = 0;
+    }
+    saveStats(stats);
+    updateStats();
+
+    saveState({ guesses: guesses.map(g => ({ name: g.name, correct: g.correct })), gameOver: true, won });
+
+    appendLog({
+      date: getTodayStr(),
+      skill: getTodaySkill().name,
+      won,
+      attempts: guesses.length,
+      guesses: guesses.map(g => g.name),
+    });
+
+    document.getElementById('guess-input').disabled = true;
+    document.getElementById('btn-guess').disabled = true;
+
+    showResult(won, guesses.length);
+    renderLog();
+  }
+
+  function showResult(won, attempts) {
+    const banner = document.getElementById('result-banner');
+    banner.className = `result-banner ${won ? 'win' : 'lose'}`;
+    document.getElementById('result-title').textContent =
+      won ? (attempts === 1 ? '✦ Perfect!' : '✦ Correct!') : '✕ Defeated';
+    const skill = getTodaySkill();
+    document.getElementById('result-answer').innerHTML = won
+      ? `Found <strong>${skill.name}</strong> in <strong>${attempts}</strong> ${attempts === 1 ? 'attempt' : 'attempts'}!`
+      : `The ability was <strong>${skill.name}</strong>`;
+    banner.style.display = 'block';
+  }
+
+  function updateStats() {
+    document.getElementById('stat-played').textContent = stats.played;
+    document.getElementById('stat-wins').textContent = stats.wins;
+    document.getElementById('stat-streak').textContent = stats.streak;
+    document.getElementById('stat-max-streak').textContent = stats.maxStreak || 0;
+  }
+
+  // ── Countdown ─────────────────────────────────────────────────
+  let countdownInterval;
+
+  function startCountdown() {
+    if (countdownInterval) clearInterval(countdownInterval);
+    tick();
+    countdownInterval = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const diff = midnight - now;
+
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const fmt = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+
+    const el1 = document.getElementById('countdown');
+    const el2 = document.getElementById('result-countdown');
+    if (el1) el1.textContent = fmt;
+    if (el2) el2.textContent = fmt;
+
+    if (diff < 1000) setTimeout(() => location.reload(), 1100);
+  }
+
+  // ── Log / history ─────────────────────────────────────────────
+  function renderLog() {
+    const log = getLog();
+    const badge = document.getElementById('log-count-badge');
+    const body = document.getElementById('log-body');
+    badge.textContent = `${log.length} game${log.length !== 1 ? 's' : ''}`;
+
+    if (!log.length) {
+      body.innerHTML = '<div class="log-empty">No games recorded yet.</div>';
+      return;
+    }
+
+    body.innerHTML = log.map(e => {
+      const d = new Date(e.date + 'T12:00:00');
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const resClass = e.won ? 'win' : 'lose';
+      const resText = e.won ? `✦ ${e.attempts}/${MAX_GUESSES}` : '✕ DNF';
+      return `
+        <div class="log-entry">
+          <div class="log-date">${label}</div>
+          <div class="log-skill">${e.skill}</div>
+          <div class="log-result ${resClass}">${resText}</div>
+        </div>`;
+    }).join('');
+  }
+
+  function toggleLog() {
+    const body = document.getElementById('log-body');
+    const chevron = document.getElementById('log-chevron');
+    const open = body.classList.toggle('open');
+    chevron.classList.toggle('open', open);
+  }
+
+  // ── Autocomplete ──────────────────────────────────────────────
+  let acIndex = -1;
+
+  document.getElementById('guess-input').addEventListener('input', function() {
+    const val = this.value.trim().toLowerCase();
+    const list = document.getElementById('autocomplete-list');
+    list.innerHTML = '';
+    acIndex = -1;
+
+    if (!val) { list.classList.remove('open'); return; }
+
+    const guessedNames = new Set(guesses.map(g => g.name.toLowerCase()));
+    const matches = skills.filter(s =>
+      s.name.toLowerCase().includes(val) && !guessedNames.has(s.name.toLowerCase())
+    ).slice(0, 8);
+
+    if (!matches.length) { list.classList.remove('open'); return; }
+
+    matches.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'autocomplete-item';
+      item.innerHTML = `<img src="${s.url}" alt="${s.name}"><span>${highlight(s.name, val)}</span>`;
+      item.addEventListener('mousedown', () => {
+        document.getElementById('guess-input').value = s.name;
+        list.classList.remove('open');
+        submitGuess();
+      });
+      list.appendChild(item);
+    });
+
+    list.classList.add('open');
+  });
+
+  document.getElementById('guess-input').addEventListener('keydown', function(e) {
+    const list = document.getElementById('autocomplete-list');
+    const items = list.querySelectorAll('.autocomplete-item');
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      acIndex = Math.min(acIndex + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+      if (items[acIndex]) this.value = items[acIndex].querySelector('span').textContent;
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      acIndex = Math.max(acIndex - 1, -1);
+      items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+      if (acIndex >= 0 && items[acIndex]) this.value = items[acIndex].querySelector('span').textContent;
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      list.classList.remove('open');
+      submitGuess();
+    } else if (e.key === 'Escape') {
+      list.classList.remove('open');
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.autocomplete-wrap'))
+      document.getElementById('autocomplete-list').classList.remove('open');
+  });
+
+  document.getElementById('btn-guess').addEventListener('click', submitGuess);
+
+  function highlight(name, query) {
+    const idx = name.toLowerCase().indexOf(query);
+    if (idx === -1) return name;
+    return name.slice(0, idx)
+      + `<mark style="background:rgba(201,168,76,0.25);color:var(--gold-light);border-radius:2px;">${name.slice(idx, idx + query.length)}</mark>`
+      + name.slice(idx + query.length);
+  }
+
+  function shake(el) {
+    el.style.animation = 'none';
+    el.offsetHeight;
+    el.style.animation = 'shake 0.3s ease';
+  }
+
+  const _style = document.createElement('style');
+  _style.textContent = `@keyframes shake {
+    0%,100%{transform:translateX(0)} 20%{transform:translateX(-6px)} 60%{transform:translateX(6px)}
+  }`;
+  document.head.appendChild(_style);
+
+  // ── Start ─────────────────────────────────────────────────────
+  init();
+</script>
+</body>
+</html>
