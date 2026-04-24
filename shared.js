@@ -1,19 +1,5 @@
 // Shared utilities for TLdle games
 
-// Theme management
-const themeToggle = document.getElementById('themeToggle');
-const html = document.documentElement;
-
-const savedTheme = localStorage.getItem('tldle-theme') || 'dark';
-html.setAttribute('data-theme', savedTheme);
-
-themeToggle.addEventListener('click', () => {
-  const currentTheme = html.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', newTheme);
-  localStorage.setItem('tldle-theme', newTheme);
-});
-
 // Animated background canvas
 const canvas = document.getElementById('bgCanvas');
 const ctx = canvas.getContext('2d');
@@ -40,22 +26,18 @@ for (let i = 0; i < 80; i++) {
 function animateStars() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-  const isDark = html.getAttribute('data-theme') === 'dark';
-  
   stars.forEach(star => {
     star.x += star.vx;
     star.y += star.vy;
-    
+
     if (star.x < 0) star.x = canvas.width;
     if (star.x > canvas.width) star.x = 0;
     if (star.y < 0) star.y = canvas.height;
     if (star.y > canvas.height) star.y = 0;
-    
+
     ctx.beginPath();
     ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
-    ctx.fillStyle = isDark 
-      ? `rgba(212, 175, 55, ${star.alpha})` 
-      : `rgba(166, 127, 31, ${star.alpha * 0.6})`;
+    ctx.fillStyle = `rgba(212, 175, 55, ${star.alpha})`;
     ctx.fill();
   });
   
@@ -165,6 +147,7 @@ document.head.appendChild(shakeStyle);
   const EASTER_EGGS = [
     '🎂 Happy Birthday Wert!',
     'Remove daggers pls',
+    "This was Akaino's idea",
   ];
 
   const toastStyle = document.createElement('style');
