@@ -4,304 +4,848 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TLdle</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<link rel="icon" type="image/webp" href="throne-and-liberty-icon.webp">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --gold: #c9a84c;
-    --gold-light: #e8c96a;
-    --gold-dim: #7a6230;
-    --bg: #0a0b0f;
-    --bg2: #111318;
-    --bg3: #181c24;
-    --border: #2a2e3a;
-    --border-gold: #3d3520;
-    --text: #d4cfc4;
-    --text-dim: #6b6560;
+:root {
+  --bg-base: #070810;
+  --bg-layer1: #0d0f1a;
+  --bg-layer2: #13151f;
+  --bg-layer3: #1a1d2b;
+  --border-subtle: #252838;
+  --border-medium: #2f3447;
+  --border-bright: #3d4256;
+  --text-primary: #e8e4dc;
+  --text-secondary: #b0a99d;
+  --text-dim: #6b6660;
+  --gold-bright: #f4d58d;
+  --gold-medium: #d4af37;
+  --gold-dim: #8a6f29;
+  --gold-shadow: rgba(212, 175, 55, 0.15);
+  --purple-bright: #b48eff;
+  --purple-medium: #7c5adb;
+  --purple-dim: #4a3580;
+  --purple-shadow: rgba(124, 90, 219, 0.12);
+  --blue-bright: #6eb8ff;
+  --blue-medium: #4a8fc9;
+  --blue-dim: #2d5578;
+  --blue-shadow: rgba(74, 143, 201, 0.1);
+  --glow-gold: rgba(244, 213, 141, 0.25);
+  --glow-purple: rgba(180, 142, 255, 0.2);
+  --glow-blue: rgba(110, 184, 255, 0.18);
+}
+
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+/* Animated background */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.bg-orbs {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  animation: float 20s ease-in-out infinite;
+}
+
+.orb-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, var(--purple-medium), transparent);
+  top: -10%;
+  left: -10%;
+  animation-delay: 0s;
+}
+
+.orb-2 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, var(--gold-medium), transparent);
+  top: 50%;
+  right: -10%;
+  animation-delay: -7s;
+}
+
+.orb-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, var(--blue-medium), transparent);
+  bottom: -10%;
+  left: 30%;
+  animation-delay: -14s;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -40px) scale(1.1); }
+  50% { transform: translate(-20px, -80px) scale(0.9); }
+  75% { transform: translate(-40px, -40px) scale(1.05); }
+}
+
+/* Particles */
+.particles {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--gold-bright);
+  border-radius: 50%;
+  opacity: 0;
+  animation: rise 8s linear infinite;
+}
+
+@keyframes rise {
+  0% { 
+    transform: translateY(100vh) scale(0);
+    opacity: 0;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Crimson Pro', Georgia, serif;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-x: hidden;
+  10% { opacity: 0.6; }
+  90% { opacity: 0.6; }
+  100% { 
+    transform: translateY(-100px) scale(1);
+    opacity: 0;
   }
+}
 
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(60,40,120,0.12) 0%, transparent 50%),
-      radial-gradient(ellipse 40% 60% at 80% 60%, rgba(120,40,40,0.08) 0%, transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-  }
+.content-wrap {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
-  .wrap {
-    position: relative;
-    z-index: 1;
-    width: 100%;
-    max-width: 600px;
-    padding: 0 16px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 32px;
-  }
+/* Header */
+.header {
+  width: 100%;
+  padding: 60px 0 40px;
+  text-align: center;
+  position: relative;
+}
 
-  header {
-    text-align: center;
-    padding: 48px 0 0;
-    width: 100%;
-  }
+.logo-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 20px;
+}
 
-  .logo {
-    font-family: 'Cinzel', serif;
-    font-size: 52px;
-    font-weight: 900;
-    letter-spacing: 6px;
-    background: linear-gradient(180deg, #f0d97a 0%, #c9a84c 45%, #8a6820 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    line-height: 1;
-    filter: drop-shadow(0 2px 12px rgba(201,168,76,0.3));
-  }
+.logo {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(48px, 8vw, 72px);
+  font-weight: 900;
+  letter-spacing: 8px;
+  background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold-medium) 50%, var(--gold-dim) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 4px 20px var(--glow-gold));
+  position: relative;
+  display: inline-block;
+  animation: logoGlow 4s ease-in-out infinite;
+}
 
-  .tagline {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 4px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    margin-top: 10px;
-  }
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 4px 20px var(--glow-gold)); }
+  50% { filter: drop-shadow(0 6px 30px var(--glow-gold)) drop-shadow(0 0 50px var(--glow-gold)); }
+}
 
-  .divider {
-    width: 240px;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
-    margin: 16px auto 0;
-  }
+.logo-glow {
+  position: absolute;
+  inset: -20px;
+  background: radial-gradient(ellipse, var(--glow-gold), transparent 70%);
+  z-index: -1;
+  opacity: 0.5;
+  animation: pulseGlow 3s ease-in-out infinite;
+}
 
+@keyframes pulseGlow {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.2); opacity: 0.8; }
+}
+
+.tagline {
+  font-family: 'Cinzel', serif;
+  font-size: clamp(13px, 2vw, 16px);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.header-divider {
+  width: 300px;
+  height: 2px;
+  margin: 0 auto;
+  background: linear-gradient(90deg, transparent, var(--gold-medium), transparent);
+  position: relative;
+}
+
+.header-divider::before,
+.header-divider::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--gold-bright);
+  border-radius: 50%;
+  top: 50%;
+  transform: translateY(-50%);
+  box-shadow: 0 0 12px var(--glow-gold);
+}
+
+.header-divider::before { left: 0; }
+.header-divider::after { right: 0; }
+
+
+/* Game cards */
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 32px;
+  width: 100%;
+  max-width: 900px;
+  margin-top: 60px;
+}
+
+@media (max-width: 768px) {
   .games-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    width: 100%;
+    grid-template-columns: 1fr;
+    gap: 24px;
   }
+}
 
-  @media (max-width: 480px) {
-    .games-grid { grid-template-columns: 1fr; }
+.game-card {
+  position: relative;
+  background: var(--bg-layer1);
+  border: 1px solid var(--border-medium);
+  border-radius: 20px;
+  padding: 40px 28px 32px;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.game-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold-medium), transparent);
+  opacity: 0.7;
+  transition: opacity 0.4s ease;
+}
+
+.game-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 0%, var(--glow-purple), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+
+.game-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--gold-bright);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3), 0 0 60px var(--glow-gold);
+}
+
+.game-card:hover::before {
+  opacity: 1;
+  background: linear-gradient(90deg, transparent, var(--gold-bright), var(--purple-bright), var(--gold-bright), transparent);
+}
+
+.game-card:hover::after {
+  opacity: 0.3;
+}
+
+.game-card:nth-child(1)::after {
+  background: radial-gradient(circle at 50% 0%, var(--glow-purple), transparent 60%);
+}
+
+.game-card:nth-child(2)::after {
+  background: radial-gradient(circle at 50% 0%, var(--glow-blue), transparent 60%);
+}
+
+/* Icon */
+.card-icon-wrap {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin-bottom: 8px;
+}
+
+.card-icon-frame {
+  position: absolute;
+  inset: -8px;
+  border: 2px solid var(--border-bright);
+  border-radius: 12px;
+  pointer-events: none;
+  transition: all 0.4s ease;
+}
+
+.game-card:hover .card-icon-frame {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 30px var(--glow-gold), inset 0 0 20px var(--glow-gold);
+  transform: scale(1.05);
+}
+
+.card-icon-frame::before,
+.card-icon-frame::after {
+  content: '';
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: var(--gold-medium);
+  border-radius: 50%;
+  transition: all 0.4s ease;
+  box-shadow: 0 0 12px var(--glow-gold);
+}
+
+.game-card:hover .card-icon-frame::before,
+.game-card:hover .card-icon-frame::after {
+  background: var(--gold-bright);
+  box-shadow: 0 0 20px var(--glow-gold);
+  transform: scale(1.3);
+}
+
+.card-icon-frame::before { top: -5px; left: -5px; }
+.card-icon-frame::after { bottom: -5px; right: -5px; }
+
+.card-canvas {
+  width: 120px;
+  height: 120px;
+  border-radius: 8px;
+  display: block;
+  transition: all 0.4s ease;
+  filter: blur(8px) brightness(0.6);
+}
+
+.game-card:hover .card-canvas {
+  filter: blur(4px) brightness(0.8);
+  transform: scale(1.05);
+}
+
+/* Text content */
+.card-title {
+  font-family: 'Cinzel', serif;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  background: linear-gradient(135deg, var(--gold-bright), var(--gold-medium));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 4px;
+  transition: all 0.3s ease;
+}
+
+.game-card:hover .card-title {
+  filter: drop-shadow(0 0 20px var(--glow-gold));
+}
+
+.card-desc {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-secondary);
+  max-width: 280px;
+  transition: color 0.3s ease;
+}
+
+.game-card:hover .card-desc {
+  color: var(--text-primary);
+}
+
+/* Hint tags */
+.card-hints {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.hint-tag {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  background: var(--bg-layer2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 20px;
+  color: var(--text-dim);
+  transition: all 0.3s ease;
+}
+
+.game-card:hover .hint-tag {
+  border-color: var(--gold-dim);
+  color: var(--gold-medium);
+  background: var(--bg-layer3);
+  transform: translateY(-2px);
+}
+
+.hint-tag:nth-child(1) { transition-delay: 0.05s; }
+.hint-tag:nth-child(2) { transition-delay: 0.1s; }
+
+/* Play button */
+.card-play-btn {
+  margin-top: 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 36px;
+  background: linear-gradient(135deg, var(--bg-layer3), var(--bg-layer2));
+  border: 2px solid var(--gold-dim);
+  border-radius: 8px;
+  color: var(--gold-medium);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-play-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--gold-medium), var(--purple-medium));
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.card-play-btn .btn-text {
+  position: relative;
+  z-index: 1;
+}
+
+.game-card:hover .card-play-btn {
+  border-color: var(--gold-bright);
+  color: var(--text-primary);
+  box-shadow: 0 0 30px var(--glow-gold);
+  transform: scale(1.05);
+}
+
+.game-card:hover .card-play-btn::before {
+  opacity: 0.15;
+}
+
+/* Footer */
+.footer {
+  margin-top: 80px;
+  padding: 20px;
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  opacity: 0.7;
+}
+
+.footer a {
+  color: var(--gold-dim);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: var(--gold-medium);
+}
+
+/* Streak badge */
+.streak-display {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 100;
+  background: var(--bg-layer2);
+  border: 1px solid var(--border-medium);
+  border-radius: 12px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.streak-icon {
+  font-size: 20px;
+  animation: flickerFlame 2s ease-in-out infinite;
+}
+
+@keyframes flickerFlame {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.1); filter: brightness(1.3); }
+}
+
+.streak-text {
+  font-family: 'Cinzel', serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: var(--text-secondary);
+}
+
+.streak-count {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--gold-bright);
+  margin-left: 4px;
+}
+
+@media (max-width: 768px) {
+  .streak-display {
+    left: 50%;
+    transform: translateX(-50%);
   }
+}
 
-  .game-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 28px 20px 24px;
-    text-align: center;
-    text-decoration: none;
-    color: inherit;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 14px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
-    cursor: pointer;
-  }
+.bday-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  z-index: 200;
+  background: var(--bg-layer2);
+  border: 1px solid var(--gold-medium);
+  border-radius: 14px;
+  padding: 14px 28px;
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: var(--gold-bright);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 40px var(--glow-gold);
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  white-space: nowrap;
+  pointer-events: none;
+}
 
-  .game-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-    opacity: 0.6;
-    transition: opacity 0.2s;
-  }
-
-  .game-card:hover {
-    border-color: var(--gold-dim);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(201,168,76,0.08);
-  }
-
-  .game-card:hover::before { opacity: 1; }
-
-  .card-icon-wrap {
-    width: 80px;
-    height: 80px;
-    position: relative;
-  }
-
-  .card-icon-frame {
-    position: absolute;
-    inset: -5px;
-    border: 1px solid var(--gold-dim);
-    border-radius: 6px;
-    pointer-events: none;
-  }
-
-  .card-icon-frame::before, .card-icon-frame::after {
-    content: '';
-    position: absolute;
-    width: 6px; height: 6px;
-    background: var(--gold);
-    border-radius: 50%;
-  }
-
-  .card-icon-frame::before { top: -3px; left: -3px; }
-  .card-icon-frame::after { bottom: -3px; right: -3px; }
-
-  .card-canvas {
-    width: 80px;
-    height: 80px;
-    border-radius: 4px;
-    display: block;
-  }
-
-  .card-title {
-    font-family: 'Cinzel', serif;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    color: var(--gold-light);
-  }
-
-  .card-desc {
-    font-size: 14px;
-    color: var(--text-dim);
-    line-height: 1.5;
-  }
-
-  .card-hints {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .card-hint-tag {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    padding: 3px 8px;
-    border: 1px solid var(--border-gold);
-    border-radius: 20px;
-    color: var(--gold-dim);
-  }
-
-  .card-play-btn {
-    margin-top: 4px;
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 9px 24px;
-    background: linear-gradient(135deg, #3a2e12, #2a2208);
-    border: 1px solid var(--gold-dim);
-    border-radius: 6px;
-    color: var(--gold-light);
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-  }
-
-  .game-card:hover .card-play-btn {
-    border-color: var(--gold);
-    background: linear-gradient(135deg, #4a3e1c, #3a3010);
-  }
-
-  footer {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    letter-spacing: 2px;
-    color: var(--text-dim);
-    text-transform: uppercase;
-    opacity: 0.5;
-  }
+.bday-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <div class="logo">TLdle</div>
+
+<!-- Background elements -->
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+<div class="particles" id="particles"></div>
+
+
+<!-- Streak display -->
+<div class="streak-display" id="streakDisplay">
+  <span class="streak-icon">🔥</span>
+  <span class="streak-text">Streak: <span class="streak-count" id="streakCount">0</span></span>
+</div>
+
+<!-- Main content -->
+<div class="content-wrap">
+  <header class="header">
+    <div class="logo-container">
+      <div class="logo-glow"></div>
+      <div class="logo">TLdle</div>
+    </div>
     <div class="tagline">Daily Throne &amp; Liberty Challenges</div>
-    <div class="divider"></div>
+    <div class="header-divider"></div>
   </header>
 
   <div class="games-grid">
-    <a class="game-card" href="TLdle.html">
+    <!-- Ability Game -->
+    <a class="game-card" href="abilitydle.html" id="abilityCard">
       <div class="card-icon-wrap">
-        <canvas class="card-canvas" id="ability-canvas" width="80" height="80" oncontextmenu="return false"></canvas>
+        <canvas class="card-canvas" id="abilityCanvas" width="120" height="120"></canvas>
         <div class="card-icon-frame"></div>
       </div>
-      <div class="card-title">Ability Dle</div>
-      <div class="card-desc">Identify the ability from its icon. Six guesses.</div>
+      <h2 class="card-title">Ability Dle</h2>
+      <p class="card-desc">Identify the mystical ability from its icon. Test your mastery.</p>
       <div class="card-hints">
-        <span class="card-hint-tag">Weapon Hint</span>
-        <span class="card-hint-tag">Type Hint</span>
+        <span class="hint-tag">Weapon Hint</span>
+        <span class="hint-tag">Type Hint</span>
       </div>
-      <div class="card-play-btn">Play</div>
+      <button class="card-play-btn">
+        <span class="btn-text">Play Now</span>
+      </button>
     </a>
 
-    <a class="game-card" href="weapondle.html">
+    <!-- Weapon Game -->
+    <a class="game-card" href="weapondle.html" id="weaponCard">
       <div class="card-icon-wrap">
-        <canvas class="card-canvas" id="weapon-canvas" width="80" height="80" oncontextmenu="return false"></canvas>
+        <canvas class="card-canvas" id="weaponCanvas" width="120" height="120"></canvas>
         <div class="card-icon-frame"></div>
       </div>
-      <div class="card-title">Weapon Dle</div>
-      <div class="card-desc">Identify the weapon from its icon. Six guesses.</div>
+      <h2 class="card-title">Weapon Dle</h2>
+      <p class="card-desc">Recognize legendary weapons by their silhouette. Prove your knowledge.</p>
       <div class="card-hints">
-        <span class="card-hint-tag">Type Hint</span>
-        <span class="card-hint-tag">Range Hint</span>
+        <span class="hint-tag">Type Hint</span>
+        <span class="hint-tag">Range Hint</span>
       </div>
-      <div class="card-play-btn">Play</div>
+      <button class="card-play-btn">
+        <span class="btn-text">Play Now</span>
+      </button>
     </a>
   </div>
 
-  <footer>Throne &amp; Liberty &mdash; Unofficial Fan Project</footer>
+  <footer class="footer">
+    Throne &amp; Liberty &mdash; Unofficial Fan Project
+  </footer>
 </div>
 
 <script>
-  function drawOnCanvas(id, src) {
-    const canvas = document.getElementById(id);
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); };
-    img.src = src;
+
+// Animated background canvas
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+const stars = [];
+for (let i = 0; i < 100; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 1.5,
+    vx: (Math.random() - 0.5) * 0.2,
+    vy: (Math.random() - 0.5) * 0.2,
+    alpha: Math.random() * 0.5 + 0.2
+  });
+}
+
+function animateStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  stars.forEach(star => {
+    star.x += star.vx;
+    star.y += star.vy;
+
+    if (star.x < 0) star.x = canvas.width;
+    if (star.x > canvas.width) star.x = 0;
+    if (star.y < 0) star.y = canvas.height;
+    if (star.y > canvas.height) star.y = 0;
+
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(212, 175, 55, ${star.alpha})`;
+    ctx.fill();
+  });
+  
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+
+// Particles
+const particlesContainer = document.getElementById('particles');
+function createParticle() {
+  const particle = document.createElement('div');
+  particle.className = 'particle';
+  particle.style.left = Math.random() * 100 + '%';
+  particle.style.animationDelay = Math.random() * 8 + 's';
+  particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+  particlesContainer.appendChild(particle);
+  
+  setTimeout(() => particle.remove(), 10000);
+}
+
+setInterval(createParticle, 800);
+for (let i = 0; i < 10; i++) {
+  setTimeout(createParticle, i * 800);
+}
+
+// Image lists for cycling previews
+const SKILL_URLS = [
+  'ArrowVortex','ChainHook','IceSpear','Tornado','Bloodlust','MultiShot',
+  'FlameCondensation','RecoilShot','DeathBlow','Slash','BasicShot',
+  'DoubleSlash','Swing','MagicOrb','Mutilation','PiercingStrike',
+  'HealingTouch','ShieldStrike','QuickFire','BrutalArrow','Blitz',
+  'ChainLightning','InfernalMeteor','AbyssalCleave','FireballBarrage',
+  'HellfireRain','IceTornado','Cataclysm','DevastatingSmash',
+  'GuillotineBlade','FrenziedSwordDance','ShadowStrike','VampiricStrike',
+  'AssassinsStep','KnifeThrowing','LightningThrow','PhantomSmokescreen',
+  'NaturesBlessing','PurifyingTouch','FlashArrow','Strafing',
+  'EnsnaringArrow','DeadlyMarker','LimitBreak','ZephyrsNock',
+  'ExplosiveTrap','MotherNaturesProtest','MercilessBarrage',
+  'ManaExchange','CollisionShot','WeakPointShot','JudgmentLightning',
+  'ThundersBlessing','VictoriousEnergy','FountainOfLife','SwiftHealing'
+].map(f => `Skills/${f}.webp`);
+
+const WEAPON_URLS = [
+  "Aelon's Rejuvenating Longbow","Ahzreil's Siphoning Sword",
+  "Celestial Cyclone Warblade","Codex of Deep Secrets",
+  "Crimson Doomblade","Crimson Hellskewer","Immortal Titanic Quakeblade",
+  "Karnix's Netherblade","Karnix's Netherbow","Mystic Truestrike Longbow",
+  "Naru's Sawfang Spear","Peerless Obsidian Razors",
+  "Queen Bellandir's Languishing Blade","Sacred Manuscript",
+  "Staff of Enlightened Reform","Stormbringer Crossbows",
+  "Titanspine Longbow","Unrelenting Annihilation Crossbows",
+  "Unshakeable Knight's Sword","Windsheer Spear"
+].map(n => `Weapons/${encodeURIComponent(n)}.webp`);
+
+// Slowly breathes through all images with a crossfade
+function createImageCycler(canvasId, imageUrls) {
+  const canvas = document.getElementById(canvasId);
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const urls = [...imageUrls].sort(() => Math.random() - 0.5);
+  const cache = {};
+
+  function getImg(idx) {
+    const url = urls[((idx % urls.length) + urls.length) % urls.length];
+    if (!cache[url]) { const img = new Image(); img.src = url; cache[url] = img; }
+    return cache[url];
   }
 
-  // Show a blurred preview on each card
-  const EPOCH = new Date('2026-01-01T00:00:00Z');
-  const today = new Date();
-  const days = Math.floor((today - EPOCH) / 86400000);
+  for (let i = 0; i < Math.min(3, urls.length); i++) getImg(i);
 
-  const ABILITY_FILES = ['ArrowVortex','ChainHook','IceSpear','Tornado','Bloodlust','MultiShot','FlameCondensation','RecoilShot'];
-  const WEAPON_FILES = ["Aelon's Rejuvenating Longbow","Ahzreil's Siphoning Sword","Celestial Cyclone Warblade","Naru's Sawfang Spear","Codex of Deep Secrets","Karnix's Netherbow"];
+  let currentIdx = 0;
+  let phase = 'hold';
+  const HOLD_MS = 3000, FADE_MS = 1200;
+  let elapsed = 0, lastTime = null;
 
-  const abilityFile = ABILITY_FILES[days % ABILITY_FILES.length];
-  const weaponFile  = WEAPON_FILES[days % WEAPON_FILES.length];
+  function loop(timestamp) {
+    if (lastTime === null) lastTime = timestamp;
+    const dt = Math.min(timestamp - lastTime, 100);
+    lastTime = timestamp;
+    elapsed += dt;
 
-  const abilityCanvas = document.getElementById('ability-canvas');
-  const weaponCanvas  = document.getElementById('weapon-canvas');
+    ctx.clearRect(0, 0, W, H);
 
-  [abilityCanvas, weaponCanvas].forEach(c => {
-    c.style.filter = 'blur(6px) brightness(0.5)';
+    if (phase === 'hold') {
+      const img = getImg(currentIdx);
+      if (img.complete && img.naturalWidth > 0) {
+        ctx.globalAlpha = 1;
+        ctx.drawImage(img, 0, 0, W, H);
+      }
+      if (elapsed >= HOLD_MS) { phase = 'fade'; elapsed = 0; getImg(currentIdx + 1); getImg(currentIdx + 2); }
+    } else {
+      const t = Math.min(elapsed / FADE_MS, 1);
+      const imgOut = getImg(currentIdx);
+      const imgIn  = getImg(currentIdx + 1);
+      if (imgOut.complete && imgOut.naturalWidth > 0) { ctx.globalAlpha = 1 - t; ctx.drawImage(imgOut, 0, 0, W, H); }
+      if (imgIn.complete  && imgIn.naturalWidth  > 0) { ctx.globalAlpha = t;     ctx.drawImage(imgIn,  0, 0, W, H); }
+      ctx.globalAlpha = 1;
+      if (t >= 1) { currentIdx = (currentIdx + 1) % urls.length; phase = 'hold'; elapsed = 0; }
+    }
+
+    requestAnimationFrame(loop);
+  }
+
+  const first = getImg(0);
+  if (first.complete) requestAnimationFrame(loop);
+  else first.onload = () => requestAnimationFrame(loop);
+}
+
+createImageCycler('abilityCanvas', SKILL_URLS);
+createImageCycler('weaponCanvas', WEAPON_URLS);
+
+// Streak display — shows the best active streak across both games
+function updateStreak() {
+  const ability = JSON.parse(localStorage.getItem('abilitydle_stats') || '{}');
+  const weapon  = JSON.parse(localStorage.getItem('weapondle_stats')  || '{}');
+  const best = Math.max(ability.streak || 0, weapon.streak || 0);
+  document.getElementById('streakCount').textContent = best;
+}
+updateStreak();
+
+// Card interaction effects
+const cards = document.querySelectorAll('.game-card');
+cards.forEach((card, index) => {
+  card.addEventListener('mouseenter', () => {
+    // Add extra particles on hover
+    for (let i = 0; i < 3; i++) {
+      setTimeout(createParticle, i * 100);
+    }
   });
+});
 
-  drawOnCanvas('ability-canvas', 'Skills/' + abilityFile + '.webp');
-  drawOnCanvas('weapon-canvas',  'Weapons/' + encodeURIComponent(weaponFile) + '.webp');
+// Prevent default link behavior for play buttons
+document.querySelectorAll('.card-play-btn').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+  });
+});
+
+// Easter egg toasts — add more messages to this array to extend
+const EASTER_EGGS = [
+  '🎂 Happy Birthday Wert!',
+  'Remove daggers pls',
+];
+
+if (Math.random() < 0.5) {
+  const msg = EASTER_EGGS[Math.floor(Math.random() * EASTER_EGGS.length)];
+  const toast = document.createElement('div');
+  toast.className = 'bday-toast';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add('show'), 800);
+}
 </script>
+
 </body>
 </html>

@@ -87,6 +87,7 @@ body {
   transition: background 0.4s ease, color 0.4s ease;
 }
 
+/* Background effects */
 .bg-canvas {
   position: fixed;
   inset: 0;
@@ -114,10 +115,10 @@ body {
 .orb-1 {
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, var(--blue-medium), transparent);
+  background: radial-gradient(circle, var(--purple-medium), transparent);
   top: 10%;
-  right: -10%;
-  animation-delay: -3s;
+  left: -10%;
+  animation-delay: 0s;
 }
 
 .orb-2 {
@@ -125,8 +126,8 @@ body {
   height: 250px;
   background: radial-gradient(circle, var(--gold-medium), transparent);
   top: 60%;
-  left: -5%;
-  animation-delay: -10s;
+  right: -5%;
+  animation-delay: -7s;
 }
 
 @keyframes float {
@@ -173,6 +174,7 @@ body {
   align-items: center;
 }
 
+/* Header */
 .header {
   width: 100%;
   padding: 32px 0 24px;
@@ -302,6 +304,7 @@ body {
   color: var(--gold-medium);
 }
 
+/* Game info bar */
 .info-bar {
   width: 100%;
   display: flex;
@@ -335,6 +338,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* Stats row */
 .stats-row {
   width: 100%;
   display: grid;
@@ -375,7 +379,8 @@ body {
   color: var(--text-dim);
 }
 
-.weapon-card {
+/* Skill card */
+.skill-card {
   width: 100%;
   background: var(--bg-layer1);
   border: 1px solid var(--border-medium);
@@ -388,17 +393,17 @@ body {
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
-.weapon-card::before {
+.skill-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 3px;
-  background: linear-gradient(90deg, transparent, var(--blue-medium), transparent);
+  background: linear-gradient(90deg, transparent, var(--gold-medium), transparent);
 }
 
-.weapon-card-title {
+.skill-card-title {
   font-family: 'Cinzel', serif;
   font-size: 14px;
   letter-spacing: 3px;
@@ -407,14 +412,14 @@ body {
   margin-bottom: 24px;
 }
 
-.weapon-icon-wrap {
+.skill-icon-wrap {
   position: relative;
   width: 140px;
   height: 140px;
   margin: 0 auto 20px;
 }
 
-.weapon-icon-frame {
+.skill-icon-frame {
   position: absolute;
   inset: -8px;
   border: 2px solid var(--border-bright);
@@ -423,22 +428,22 @@ body {
   transition: all 0.5s ease;
 }
 
-.weapon-icon-frame::before,
-.weapon-icon-frame::after {
+.skill-icon-frame::before,
+.skill-icon-frame::after {
   content: '';
   position: absolute;
   width: 10px;
   height: 10px;
-  background: var(--blue-medium);
+  background: var(--gold-medium);
   border-radius: 50%;
-  box-shadow: 0 0 12px rgba(110, 184, 255, 0.4);
+  box-shadow: 0 0 12px var(--glow-gold);
   transition: all 0.5s ease;
 }
 
-.weapon-icon-frame::before { top: -5px; left: -5px; }
-.weapon-icon-frame::after { bottom: -5px; right: -5px; }
+.skill-icon-frame::before { top: -5px; left: -5px; }
+.skill-icon-frame::after { bottom: -5px; right: -5px; }
 
-.weapon-canvas {
+.skill-canvas {
   width: 140px;
   height: 140px;
   border-radius: 8px;
@@ -447,7 +452,7 @@ body {
   filter: blur(12px) brightness(0.5);
 }
 
-.weapon-canvas.revealed {
+.skill-canvas.revealed {
   filter: none !important;
   animation: iconReveal 0.8s ease;
 }
@@ -471,6 +476,7 @@ body {
   font-weight: 600;
 }
 
+/* Hint badges */
 .hint-badges {
   display: flex;
   gap: 12px;
@@ -494,14 +500,14 @@ body {
 }
 
 .hint-badge.revealed {
-  border-color: var(--blue-dim);
+  border-color: var(--gold-dim);
   background: var(--bg-layer3);
 }
 
 @keyframes hintPop {
-  0% { transform: scale(1); border-color: var(--blue-bright); box-shadow: 0 0 20px rgba(110, 184, 255, 0.3); }
+  0% { transform: scale(1); border-color: var(--gold-bright); box-shadow: 0 0 20px var(--glow-gold); }
   50% { transform: scale(1.05); }
-  100% { transform: scale(1); border-color: var(--blue-dim); box-shadow: none; }
+  100% { transform: scale(1); border-color: var(--gold-dim); box-shadow: none; }
 }
 
 .hint-badge.hint-pop {
@@ -520,7 +526,7 @@ body {
   font-family: 'Cinzel', serif;
   font-size: 15px;
   font-weight: 600;
-  color: var(--blue-medium);
+  color: var(--gold-medium);
   line-height: 1.3;
   text-align: center;
 }
@@ -540,10 +546,11 @@ body {
 }
 
 .hint-toggle-btn:hover {
-  color: var(--blue-medium);
+  color: var(--gold-medium);
   transform: scale(1.15);
 }
 
+/* Input section */
 .input-section {
   width: 100%;
   margin-top: 24px;
@@ -573,8 +580,8 @@ body {
 }
 
 .guess-input:focus {
-  border-color: var(--blue-medium);
-  box-shadow: 0 0 0 3px rgba(110, 184, 255, 0.15);
+  border-color: var(--gold-medium);
+  box-shadow: 0 0 0 3px var(--gold-shadow);
 }
 
 .guess-input::placeholder {
@@ -593,8 +600,8 @@ body {
   top: 50%;
   transform: translateY(-50%);
   background: linear-gradient(135deg, var(--bg-layer3), var(--bg-layer2));
-  border: 2px solid var(--blue-dim);
-  color: var(--blue-medium);
+  border: 2px solid var(--gold-dim);
+  color: var(--gold-medium);
   border-radius: 8px;
   width: 44px;
   height: 44px;
@@ -606,9 +613,9 @@ body {
 }
 
 .btn-submit:hover:not(:disabled) {
-  border-color: var(--blue-bright);
-  background: linear-gradient(135deg, var(--blue-dim), var(--bg-layer3));
-  box-shadow: 0 0 20px rgba(110, 184, 255, 0.3);
+  border-color: var(--gold-bright);
+  background: linear-gradient(135deg, var(--gold-dim), var(--bg-layer3));
+  box-shadow: 0 0 20px var(--glow-gold);
   transform: translateY(-50%) scale(1.08);
 }
 
@@ -617,6 +624,7 @@ body {
   cursor: not-allowed;
 }
 
+/* Autocomplete */
 .autocomplete-list {
   position: absolute;
   top: calc(100% + 6px);
@@ -650,7 +658,6 @@ body {
   gap: 12px;
   transition: all 0.2s ease;
   border-bottom: 1px solid var(--border-subtle);
-  font-size: 16px;
 }
 
 .autocomplete-item:last-child {
@@ -660,9 +667,24 @@ body {
 .autocomplete-item:hover,
 .autocomplete-item.active {
   background: var(--bg-layer2);
-  color: var(--blue-bright);
+  color: var(--gold-bright);
 }
 
+.autocomplete-item img {
+  width: 32px;
+  height: 32px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
+.autocomplete-item span {
+  flex: 1;
+  font-size: 16px;
+}
+
+/* Guesses list */
 .guesses-section {
   width: 100%;
   margin-top: 24px;
@@ -712,6 +734,15 @@ body {
   background: var(--wrong-bg);
 }
 
+.guess-row img {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  flex-shrink: 0;
+}
+
 .guess-name {
   flex: 1;
   font-size: 17px;
@@ -731,6 +762,7 @@ body {
   flex-shrink: 0;
 }
 
+/* Result banner */
 .result-banner {
   width: 100%;
   background: var(--bg-layer1);
@@ -819,6 +851,7 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+/* History section */
 .history-section {
   width: 100%;
   margin-top: 28px;
@@ -904,7 +937,7 @@ body {
   min-width: 100px;
 }
 
-.history-weapon {
+.history-skill {
   flex: 1;
   color: var(--text-secondary);
 }
@@ -941,6 +974,7 @@ body {
   }
 }
 
+/* Celebration */
 @keyframes celebrate {
   0% { transform: scale(1) rotate(0deg); }
   25% { transform: scale(1.2) rotate(10deg); }
@@ -952,16 +986,11 @@ body {
 .celebrate {
   animation: celebrate 0.6s ease;
 }
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-8px); }
-  60% { transform: translateX(8px); }
-}
 </style>
 </head>
 <body>
 
+<!-- Background -->
 <canvas class="bg-canvas" id="bgCanvas"></canvas>
 <div class="bg-orbs">
   <div class="orb orb-1"></div>
@@ -969,6 +998,7 @@ body {
 </div>
 <div class="particles" id="particles"></div>
 
+<!-- Theme toggle -->
 <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <circle cx="12" cy="12" r="5"/>
@@ -984,6 +1014,7 @@ body {
 </button>
 
 <div class="content-wrap">
+  <!-- Header -->
   <header class="header">
     <div class="header-top">
       <a class="home-link" href="index.html">
@@ -994,13 +1025,14 @@ body {
       </a>
       <div class="header-center">
         <div class="logo">TLdle</div>
-        <div class="subtitle">· Weapon ·</div>
+        <div class="subtitle">· Ability ·</div>
       </div>
       <div style="flex: 1;"></div>
     </div>
     <div class="header-divider"></div>
   </header>
 
+  <!-- Info bar -->
   <div class="info-bar">
     <div class="date-display" id="dateDisplay"></div>
     <div class="countdown-wrap">
@@ -1009,6 +1041,7 @@ body {
     </div>
   </div>
 
+  <!-- Stats -->
   <div class="stats-row">
     <div class="stat-box">
       <div class="stat-value" id="statPlayed">0</div>
@@ -1028,30 +1061,33 @@ body {
     </div>
   </div>
 
-  <div class="weapon-card">
-    <h2 class="weapon-card-title">Which weapon is this?</h2>
-    <div class="weapon-icon-wrap">
-      <canvas class="weapon-canvas" id="weaponCanvas" width="140" height="140"></canvas>
-      <div class="weapon-icon-frame"></div>
+  <!-- Skill card -->
+  <div class="skill-card">
+    <h2 class="skill-card-title">Which ability is this?</h2>
+    <div class="skill-icon-wrap">
+      <canvas class="skill-canvas" id="skillCanvas" width="140" height="140"></canvas>
+      <div class="skill-icon-frame"></div>
     </div>
     <div class="attempts-display">
       Attempts: <span class="count" id="attemptCount">0</span> / 6
     </div>
 
+    <!-- Hints -->
     <div class="hint-badges">
+      <div class="hint-badge" id="hintWeapon">
+        <button class="hint-toggle-btn" id="toggleWeapon" title="Toggle weapon hint"></button>
+        <div class="hint-label">Weapon</div>
+        <div class="hint-value" id="valueWeapon">—</div>
+      </div>
       <div class="hint-badge" id="hintType">
         <button class="hint-toggle-btn" id="toggleType" title="Toggle type hint"></button>
         <div class="hint-label">Type</div>
         <div class="hint-value" id="valueType">—</div>
       </div>
-      <div class="hint-badge" id="hintRange">
-        <button class="hint-toggle-btn" id="toggleRange" title="Toggle range hint"></button>
-        <div class="hint-label">Range</div>
-        <div class="hint-value" id="valueRange">—</div>
-      </div>
     </div>
   </div>
 
+  <!-- Input -->
   <div class="input-section">
     <div class="input-wrap">
       <div class="autocomplete-container">
@@ -1059,7 +1095,7 @@ body {
           class="guess-input"
           id="guessInput"
           type="text"
-          placeholder="Type weapon name..."
+          placeholder="Type ability name..."
           autocomplete="off"
           spellcheck="false"
         >
@@ -1074,16 +1110,19 @@ body {
     </div>
   </div>
 
+  <!-- Result banner -->
   <div class="result-banner" id="resultBanner">
     <div class="result-title" id="resultTitle"></div>
     <div class="result-answer" id="resultAnswer"></div>
-    <div class="result-next">Next weapon in <span class="time" id="resultCountdown">--:--:--</span></div>
+    <div class="result-next">Next ability in <span class="time" id="resultCountdown">--:--:--</span></div>
   </div>
 
+  <!-- Guesses -->
   <div class="guesses-section">
     <div class="guesses-list" id="guessesList"></div>
   </div>
 
+  <!-- History -->
   <div class="history-section">
     <button class="history-toggle" id="historyToggle">
       <span class="history-label">History</span>
@@ -1099,7 +1138,7 @@ body {
 </div>
 
 <script src="shared.js"></script>
-<script src="weapon-game.js"></script>
+<script src="ability-game.js"></script>
 
 </body>
 </html>
