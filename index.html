@@ -1,9 +1,307 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=tl-abilitydle.html">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TLdle</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim: #7a6230;
+    --bg: #0a0b0f;
+    --bg2: #111318;
+    --bg3: #181c24;
+    --border: #2a2e3a;
+    --border-gold: #3d3520;
+    --text: #d4cfc4;
+    --text-dim: #6b6560;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(60,40,120,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 60% at 80% 60%, rgba(120,40,40,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+    padding: 0 16px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+  }
+
+  header {
+    text-align: center;
+    padding: 48px 0 0;
+    width: 100%;
+  }
+
+  .logo {
+    font-family: 'Cinzel', serif;
+    font-size: 52px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    background: linear-gradient(180deg, #f0d97a 0%, #c9a84c 45%, #8a6820 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    filter: drop-shadow(0 2px 12px rgba(201,168,76,0.3));
+  }
+
+  .tagline {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  .divider {
+    width: 240px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 16px auto 0;
+  }
+
+  .games-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    .games-grid { grid-template-columns: 1fr; }
+  }
+
+  .game-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px 20px 24px;
+    text-align: center;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    cursor: pointer;
+  }
+
+  .game-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+
+  .game-card:hover {
+    border-color: var(--gold-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(201,168,76,0.08);
+  }
+
+  .game-card:hover::before { opacity: 1; }
+
+  .card-icon-wrap {
+    width: 80px;
+    height: 80px;
+    position: relative;
+  }
+
+  .card-icon-frame {
+    position: absolute;
+    inset: -5px;
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  .card-icon-frame::before, .card-icon-frame::after {
+    content: '';
+    position: absolute;
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .card-icon-frame::before { top: -3px; left: -3px; }
+  .card-icon-frame::after { bottom: -3px; right: -3px; }
+
+  .card-canvas {
+    width: 80px;
+    height: 80px;
+    border-radius: 4px;
+    display: block;
+  }
+
+  .card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--gold-light);
+  }
+
+  .card-desc {
+    font-size: 14px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .card-hints {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .card-hint-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border: 1px solid var(--border-gold);
+    border-radius: 20px;
+    color: var(--gold-dim);
+  }
+
+  .card-play-btn {
+    margin-top: 4px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 9px 24px;
+    background: linear-gradient(135deg, #3a2e12, #2a2208);
+    border: 1px solid var(--gold-dim);
+    border-radius: 6px;
+    color: var(--gold-light);
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .game-card:hover .card-play-btn {
+    border-color: var(--gold);
+    background: linear-gradient(135deg, #4a3e1c, #3a3010);
+  }
+
+  footer {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+</style>
 </head>
-<body></body>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">TLdle</div>
+    <div class="tagline">Daily Throne &amp; Liberty Challenges</div>
+    <div class="divider"></div>
+  </header>
+
+  <div class="games-grid">
+    <a class="game-card" href="TLdle.html">
+      <div class="card-icon-wrap">
+        <canvas class="card-canvas" id="ability-canvas" width="80" height="80" oncontextmenu="return false"></canvas>
+        <div class="card-icon-frame"></div>
+      </div>
+      <div class="card-title">Ability Dle</div>
+      <div class="card-desc">Identify the ability from its icon. Six guesses.</div>
+      <div class="card-hints">
+        <span class="card-hint-tag">Weapon Hint</span>
+        <span class="card-hint-tag">Type Hint</span>
+      </div>
+      <div class="card-play-btn">Play</div>
+    </a>
+
+    <a class="game-card" href="weapondle.html">
+      <div class="card-icon-wrap">
+        <canvas class="card-canvas" id="weapon-canvas" width="80" height="80" oncontextmenu="return false"></canvas>
+        <div class="card-icon-frame"></div>
+      </div>
+      <div class="card-title">Weapon Dle</div>
+      <div class="card-desc">Identify the weapon from its icon. Six guesses.</div>
+      <div class="card-hints">
+        <span class="card-hint-tag">Type Hint</span>
+        <span class="card-hint-tag">Range Hint</span>
+      </div>
+      <div class="card-play-btn">Play</div>
+    </a>
+  </div>
+
+  <footer>Throne &amp; Liberty &mdash; Unofficial Fan Project</footer>
+</div>
+
+<script>
+  function drawOnCanvas(id, src) {
+    const canvas = document.getElementById(id);
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = () => { ctx.drawImage(img, 0, 0, canvas.width, canvas.height); };
+    img.src = src;
+  }
+
+  // Show a blurred preview on each card
+  const EPOCH = new Date('2026-01-01T00:00:00Z');
+  const today = new Date();
+  const days = Math.floor((today - EPOCH) / 86400000);
+
+  const ABILITY_FILES = ['ArrowVortex','ChainHook','IceSpear','Tornado','Bloodlust','MultiShot','FlameCondensation','RecoilShot'];
+  const WEAPON_FILES = ["Aelon's Rejuvenating Longbow","Ahzreil's Siphoning Sword","Celestial Cyclone Warblade","Naru's Sawfang Spear","Codex of Deep Secrets","Karnix's Netherbow"];
+
+  const abilityFile = ABILITY_FILES[days % ABILITY_FILES.length];
+  const weaponFile  = WEAPON_FILES[days % WEAPON_FILES.length];
+
+  const abilityCanvas = document.getElementById('ability-canvas');
+  const weaponCanvas  = document.getElementById('weapon-canvas');
+
+  [abilityCanvas, weaponCanvas].forEach(c => {
+    c.style.filter = 'blur(6px) brightness(0.5)';
+  });
+
+  drawOnCanvas('ability-canvas', 'Skills/' + abilityFile + '.webp');
+  drawOnCanvas('weapon-canvas',  'Weapons/' + encodeURIComponent(weaponFile) + '.webp');
+</script>
+</body>
 </html>

@@ -63,10 +63,38 @@
   }
 
   header {
-    text-align: center;
-    padding: 32px 0 8px;
+    padding: 24px 0 8px;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .home-link {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .home-link:hover { color: var(--gold); }
+
+  .header-logo-wrap { flex: 1; text-align: center; }
 
   .logo {
     font-family: 'Cinzel', serif;
@@ -566,7 +594,16 @@
 
 <div class="wrap">
   <header>
-    <div class="logo">TLdle<span>· Ability ·</span></div>
+    <div class="header-top">
+      <a class="home-link" href="index.html">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Home
+      </a>
+      <div class="header-logo-wrap">
+        <div class="logo">TLdle<span>· Ability ·</span></div>
+      </div>
+      <div style="flex:1"></div>
+    </div>
     <div class="divider"></div>
   </header>
 
@@ -1209,7 +1246,7 @@
     const banner = document.getElementById('result-banner');
     banner.className = `result-banner ${won ? 'win' : 'lose'}`;
     document.getElementById('result-title').textContent =
-      won ? (attempts === 1 ? '✦ Perfect!' : '✦ Correct!') : '✕ Defeated';
+      won ? (attempts === 1 ? '✦ Perfect!' : '✦ Correct!') : 'You lost, try again tomorrow!';
     const skill = getTodaySkill();
     document.getElementById('result-answer').innerHTML = won
       ? `Found <strong>${skill.name}</strong> in <strong>${attempts}</strong> ${attempts === 1 ? 'attempt' : 'attempts'}!`
@@ -1256,25 +1293,21 @@
     const btn    = document.getElementById('ht-' + key);
     const enabled = hintPrefs[key];
     const n = guesses.length;
+    const unlocked = n >= threshold || gameOver;
 
     btn.innerHTML = enabled ? EYE_OPEN : EYE_CLOSED;
     btn.style.color = enabled ? '' : 'var(--border)';
-
-    if (!enabled) {
-      badge.classList.remove('revealed', 'hint-pop');
-      badge.style.opacity = '0.4';
-      valEl.innerHTML = '<span style="color:var(--text-dim);font-size:14px;font-family:Crimson Pro,serif;">Disabled</span>';
-      return;
-    }
-
     badge.style.opacity = '';
 
-    if (n >= threshold || gameOver) {
+    if (unlocked && enabled) {
       valEl.textContent = value;
       if (!badge.classList.contains('revealed')) {
         badge.classList.add('revealed');
         if (animate) { badge.classList.remove('hint-pop'); void badge.offsetWidth; badge.classList.add('hint-pop'); }
       }
+    } else if (unlocked && !enabled) {
+      badge.classList.remove('revealed');
+      valEl.innerHTML = '<span style="color:var(--text-dim);font-size:14px;font-family:Crimson Pro,serif;">Hidden</span>';
     } else {
       badge.classList.remove('revealed');
       const rem = threshold - n;

@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TLdle — Weapon</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c9a84c;
+    --gold-light: #e8c96a;
+    --gold-dim: #7a6230;
+    --bg: #0a0b0f;
+    --bg2: #111318;
+    --bg3: #181c24;
+    --border: #2a2e3a;
+    --border-gold: #3d3520;
+    --text: #d4cfc4;
+    --text-dim: #6b6560;
+    --green: #2d6e4e;
+    --green-light: #4caf80;
+    --red: #6e2d2d;
+    --red-light: #c45c5c;
+    --correct-bg: #1a3d2e;
+    --wrong-bg: #2a1a1a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Crimson Pro', Georgia, serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(60,40,120,0.12) 0%, transparent 50%),
+      radial-gradient(ellipse 40% 60% at 80% 60%, rgba(120,40,40,0.08) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .wrap {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 560px;
+    padding: 0 16px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+  }
+
+  header {
+    padding: 24px 0 8px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .home-link {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.2s;
+    white-space: nowrap;
+    flex: 1;
+  }
+
+  .home-link:hover { color: var(--gold); }
+
+  .header-logo-wrap { flex: 1; text-align: center; }
+
+
+  .logo {
+    font-family: 'Cinzel', serif;
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    background: linear-gradient(180deg, #f0d97a 0%, #c9a84c 45%, #8a6820 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1;
+    filter: drop-shadow(0 2px 8px rgba(201,168,76,0.3));
+  }
+
+  .logo span {
+    font-size: 26px;
+    font-weight: 400;
+    display: block;
+    letter-spacing: 8px;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+
+  .divider {
+    width: 200px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-dim), transparent);
+    margin: 8px auto 0;
+  }
+
+  .date-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    width: 100%;
+  }
+
+  .date-row .date-sep { color: var(--gold-dim); }
+  .countdown-label { color: var(--text-dim); }
+  #countdown { color: var(--gold); font-variant-numeric: tabular-nums; }
+
+  #game-screen { width: 100%; display: none; flex-direction: column; align-items: center; gap: 16px; }
+
+  .skill-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    text-align: center;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+
+  .skill-card h2 {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .skill-icon-wrap {
+    position: relative;
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 16px;
+  }
+
+  .skill-icon-frame {
+    position: absolute;
+    inset: -6px;
+    border: 2px solid var(--gold-dim);
+    border-radius: 6px;
+    pointer-events: none;
+  }
+
+  .skill-icon-frame::before, .skill-icon-frame::after {
+    content: '';
+    position: absolute;
+    width: 8px; height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+  }
+
+  .skill-icon-frame::before { top: -4px; left: -4px; }
+  .skill-icon-frame::after { bottom: -4px; right: -4px; }
+
+  #skill-canvas {
+    width: 110px;
+    height: 110px;
+    border-radius: 4px;
+    display: block;
+    transition: filter 0.5s ease;
+  }
+
+  #skill-canvas.blurred { filter: blur(12px) brightness(0.6); }
+
+  .attempts-display {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .attempts-display span { color: var(--gold); }
+
+  /* Hint badges */
+  .hint-badges {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .hint-badge {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px 12px;
+    min-width: 110px;
+    text-align: center;
+    position: relative;
+    transition: border-color 0.3s, background 0.3s;
+  }
+
+  .hint-badge.revealed {
+    border-color: var(--border-gold);
+    background: #151208;
+  }
+
+  .hint-toggle-btn {
+    position: absolute;
+    top: 7px; right: 7px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 2px;
+    color: var(--gold-dim);
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    transition: color 0.15s;
+  }
+
+  .hint-toggle-btn:hover { color: var(--gold); }
+
+  .hint-badge-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    margin-bottom: 6px;
+  }
+
+  .hint-badge-val {
+    font-size: 15px;
+    color: var(--gold-light);
+    font-weight: 600;
+    min-height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @keyframes hint-pop {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+
+  .hint-pop { animation: hint-pop 0.35s ease-out; }
+
+  /* Stats */
+  .stats-bar {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .stat-box {
+    flex: 1;
+    text-align: center;
+    padding: 14px 8px;
+    border-right: 1px solid var(--border);
+  }
+
+  .stat-box:last-child { border-right: none; }
+
+  .stat-value {
+    font-family: 'Cinzel', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* Input */
+  .input-row { position: relative; width: 100%; }
+
+  .guess-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'Crimson Pro', serif;
+    font-size: 17px;
+    padding: 12px 52px 12px 16px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .guess-input:focus { border-color: var(--gold-dim); box-shadow: 0 0 0 2px rgba(201,168,76,0.1); }
+  .guess-input::placeholder { color: var(--text-dim); }
+  .guess-input:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .btn-guess {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: linear-gradient(135deg, #3a2e12, #2a2208);
+    border: 1px solid var(--gold-dim);
+    color: var(--gold-light);
+    border-radius: 6px;
+    width: 38px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .btn-guess:hover { border-color: var(--gold); }
+  .btn-guess:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Autocomplete */
+  .autocomplete-wrap { position: relative; width: 100%; }
+
+  .autocomplete-list {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0; right: 0;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    z-index: 100;
+    max-height: 220px;
+    overflow-y: auto;
+    display: none;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+
+  .autocomplete-list.open { display: block; }
+
+  .ac-item {
+    padding: 10px 14px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: background 0.1s;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:hover, .ac-item.active { background: var(--bg2); color: var(--gold-light); }
+
+  /* Result banner */
+  .result-banner {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    display: none;
+  }
+
+  .result-banner.win { border-color: var(--green); }
+  .result-banner.lose { border-color: var(--red); }
+
+  .result-title {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+  }
+
+  .result-banner.win .result-title { color: var(--green-light); }
+  .result-banner.lose .result-title { color: var(--red-light); }
+
+  .result-answer { font-size: 16px; color: var(--text); margin-bottom: 10px; }
+  .result-answer strong { color: var(--gold-light); }
+
+  .result-next {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  /* Guesses */
+  .guesses-list { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+
+  .guess-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    animation: slideIn 0.2s ease-out;
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .guess-row.correct { background: var(--correct-bg); border-color: var(--green); }
+  .guess-row.wrong   { background: var(--wrong-bg);   border-color: var(--border); }
+  .guess-row img { width: 36px; height: 36px; border-radius: 4px; flex-shrink: 0; }
+  .guess-name { flex: 1; font-size: 16px; }
+  .guess-result-icon { font-size: 14px; }
+  .guess-row.correct .guess-result-icon { color: var(--green-light); }
+  .guess-row.wrong   .guess-result-icon { color: var(--text-dim); }
+
+  /* Log */
+  .log-section {
+    width: 100%;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  .log-toggle {
+    width: 100%;
+    background: none;
+    border: none;
+    color: var(--text);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 16px 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .log-toggle-label { flex: 1; text-align: left; color: var(--text-dim); }
+  .log-count-badge {
+    font-size: 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2px 10px;
+    color: var(--text-dim);
+  }
+
+  .log-chevron { color: var(--text-dim); transition: transform 0.2s; }
+  .log-chevron.open { transform: rotate(180deg); }
+
+  .log-body { display: none; padding: 0 16px 16px; }
+  .log-body.open { display: block; }
+
+  .log-empty { color: var(--text-dim); font-size: 14px; padding: 12px 0; text-align: center; }
+
+  .log-entry {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .log-entry:last-child { border-bottom: none; }
+  .log-date { color: var(--text-dim); min-width: 80px; font-size: 12px; }
+  .log-skill { flex: 1; }
+  .log-result { font-family: 'Cinzel', serif; font-size: 11px; }
+  .log-result.win  { color: var(--green-light); }
+  .log-result.lose { color: var(--red-light); }
+
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20%,60% { transform: translateX(-4px); }
+    40%,80% { transform: translateX(4px); }
+  }
+
+  .shake { animation: shake 0.3s ease; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="header-top">
+      <a class="home-link" href="index.html">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+        Home
+      </a>
+      <div class="header-logo-wrap">
+        <div class="logo">TLdle<span>WEAPON</span></div>
+      </div>
+      <div style="flex:1"></div>
+    </div>
+    <div class="divider"></div>
+  </header>
+
+  <div class="date-row">
+    <span id="today-date"></span>
+    <span class="date-sep">·</span>
+    <span class="countdown-label">Next in</span>
+    <span id="countdown">--:--:--</span>
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-box">
+      <div class="stat-value" id="stat-played">0</div>
+      <div class="stat-label">Played</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="stat-wins">0</div>
+      <div class="stat-label">Won</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="stat-streak">0</div>
+      <div class="stat-label">Streak</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-value" id="stat-max-streak">0</div>
+      <div class="stat-label">Best</div>
+    </div>
+  </div>
+
+  <div id="game-screen">
+    <div class="skill-card">
+      <h2>Which weapon is this?</h2>
+      <div class="skill-icon-wrap">
+        <canvas id="skill-canvas" width="110" height="110" oncontextmenu="return false"></canvas>
+        <div class="skill-icon-frame"></div>
+      </div>
+      <div class="attempts-display">Attempts: <span id="attempt-count">0</span> / 6</div>
+
+
+      <div class="hint-badges">
+        <div class="hint-badge" id="hb-type">
+          <button class="hint-toggle-btn" id="ht-type" onclick="toggleHintPref('type')" title="Toggle type hint"></button>
+          <div class="hint-badge-label">Type</div>
+          <div class="hint-badge-val" id="hbv-type"></div>
+        </div>
+        <div class="hint-badge" id="hb-range">
+          <button class="hint-toggle-btn" id="ht-range" onclick="toggleHintPref('range')" title="Toggle range hint"></button>
+          <div class="hint-badge-label">Range</div>
+          <div class="hint-badge-val" id="hbv-range"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="width:100%">
+      <div class="input-row">
+        <div class="autocomplete-wrap">
+          <input
+            class="guess-input"
+            id="guess-input"
+            type="text"
+            placeholder="Type weapon name..."
+            autocomplete="off"
+            spellcheck="false"
+          >
+          <div class="autocomplete-list" id="autocomplete-list"></div>
+        </div>
+        <button class="btn-guess" id="btn-guess" title="Submit guess">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="22" y1="2" x2="11" y2="13"/>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="result-banner" id="result-banner">
+      <div class="result-title" id="result-title"></div>
+      <div class="result-answer" id="result-answer"></div>
+      <div class="result-next">Next weapon in <span id="result-countdown">--:--:--</span></div>
+    </div>
+
+    <div class="guesses-list" id="guesses-list"></div>
+
+    <div class="log-section">
+      <button class="log-toggle" onclick="toggleLog()">
+        <span class="log-toggle-label">History</span>
+        <span class="log-count-badge" id="log-count-badge">0 games</span>
+        <svg class="log-chevron" id="log-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
+      <div class="log-body" id="log-body">
+        <div class="log-empty">No games recorded yet.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Weapon manifest ───────────────────────────────────────────
+  const WEAPONS = [
+    {name:"Abyssal Renaissance Foci",              type:"Staff",          range:"17.6m"},
+    {name:"Adentus's Gargantuan Greatsword",       type:"Greatsword",     range:"2.5m"},
+    {name:"Aelon's Rejuvenating Longbow",          type:"Longbow",        range:"17.6m"},
+    {name:"Ahzreil's Siphoning Sword",             type:"Sword & Shield", range:"2.5m"},
+    {name:"Akman's Bloodletting Crossbows",        type:"Crossbow",       range:"13.2m"},
+    {name:"Arc of Lunar Radiance",                 type:"Longbow",        range:"2%"},
+    {name:"Archstaff of the Black Anvil",          type:"Staff",          range:"16m"},
+    {name:"Aridus's Gnarled Voidstaff",            type:"Staff",          range:"17.6m"},
+    {name:"Bercant's Spineflower Crossbows",       type:"Crossbow",       range:"14.4m"},
+    {name:"Bercant's Steelstring Bow",             type:"Longbow",        range:"7.2%"},
+    {name:"Bercant's Whispering Daggers",          type:"Daggers",        range:"3m"},
+    {name:"Blade of Fiendish Fortitude",           type:"Sword & Shield", range:"2.75m"},
+    {name:"Blades of the Black Anvil",             type:"Daggers",        range:"3m"},
+    {name:"Broadsword of the Juggernaught",        type:"Greatsword",     range:"2.5m"},
+    {name:"Bulwark of Invulnerability",            type:"Sword & Shield", range:"2.5m"},
+    {name:"Bulwark of the Black Anvil",            type:"Sword & Shield", range:"2.5m"},
+    {name:"Celestial Cyclone Warblade",            type:"Greatsword",     range:"3m"},
+    {name:"Chernobog's Blade of Beheading",        type:"Sword & Shield", range:"2.5m"},
+    {name:"Codex of Deep Secrets",                 type:"Wand & Tome",    range:"14m"},
+    {name:"Cordy's Grasp of Manipulation",         type:"Wand & Tome",    range:"18.2m"},
+    {name:"Cordy's Stormspore Spike Slingers",     type:"Crossbow",       range:"12m"},
+    {name:"Cordy's Warblade of Creeping Doom",     type:"Greatsword",     range:"2.5m"},
+    {name:"Cornelius's Animated Edge",             type:"Sword & Shield", range:"2.75m"},
+    {name:"Crimson Doomblade",                     type:"Sword & Shield", range:"2.5m"},
+    {name:"Crimson Hellskewer",                    type:"Spear",          range:"4m"},
+    {name:"Crimson Wicked Staff",                  type:"Staff",          range:"—"},
+    {name:"Crossbows of Infinite Steel",           type:"Crossbow",       range:"12m"},
+    {name:"Crossbows of the Black Anvil",          type:"Crossbow",       range:"12m"},
+    {name:"Crossbows of the Darkest Night",        type:"Crossbow",       range:"12m"},
+    {name:"Daigon's Charred Emberstaff",           type:"Staff",          range:"17.6m"},
+    {name:"Daigon's Stormblade",                   type:"Sword & Shield", range:"2.75m"},
+    {name:"Darkslayer Daggers",                    type:"Daggers",        range:"2.75m"},
+    {name:"Deckman's Balefire Scepter",            type:"Wand & Tome",    range:"15.4m"},
+    {name:"Deluzhnoa's Ancient Petrified Staff",   type:"Staff",          range:"4%"},
+    {name:"Deluzhnoa's Arc of Frozen Death",       type:"Longbow",        range:"8%"},
+    {name:"Deluzhnoa's Edge of Eternal Frost",     type:"Sword & Shield", range:"2.5m"},
+    {name:"Deluzhnoa's Permafrost Razors",         type:"Daggers",        range:"2.5m"},
+    {name:"Deluzhnoa's Serrated Shard",            type:"Spear",          range:"4m"},
+    {name:"Destiny Binders",                       type:"Daggers",        range:"3m"},
+    {name:"Duke Magna's Fury Warblade",            type:"Greatsword",     range:"2.5m"},
+    {name:"Duke Magna's Provoking Warblade",       type:"Greatsword",     range:"2.75m"},
+    {name:"Ebon Soulwind Archstaff",               type:"Staff",          range:"17.6m"},
+    {name:"Excavator's Mysterious Scepter",        type:"Wand & Tome",    range:"14m"},
+    {name:"Forbidden Demonic Lexicon",             type:"Wand & Tome",    range:"15.4m"},
+    {name:"Grayeye's Bloodlust Greatsword",        type:"Greatsword",     range:"2.5m"},
+    {name:"Grayeye's Dripping Tome",               type:"Wand & Tome",    range:"—"},
+    {name:"Grayeye's Electrified Staff",           type:"Staff",          range:"19.2m"},
+    {name:"Greatblade of the Black Anvil",         type:"Greatsword",     range:"2.5m"},
+    {name:"Greatsword of the Banshee",             type:"Greatsword",     range:"2.75m"},
+    {name:"Heroic Blade of the Resistance",        type:"Sword & Shield", range:"2.5m"},
+    {name:"Heroic Broadsword of the Resistance",   type:"Greatsword",     range:"2.75m"},
+    {name:"Heroic Crossbows of the Resistance",    type:"Crossbow",       range:"13.2m"},
+    {name:"Heroic Daggers of the Resistance",      type:"Daggers",        range:"3m"},
+    {name:"Heroic Longbow of the Resistance",      type:"Longbow",        range:"16m"},
+    {name:"Heroic Polearm of the Resistance",      type:"Spear",          range:"11.4%"},
+    {name:"Heroic Scepter of the Resistance",      type:"Wand & Tome",    range:"15.4m"},
+    {name:"Heroic Staff of the Resistance",        type:"Staff",          range:"16m"},
+    {name:"Immortal Titanic Quakeblade",           type:"Greatsword",     range:"2.5m"},
+    {name:"Junobote's Juggernaut Warblade",        type:"Greatsword",     range:"2.5m"},
+    {name:"Junobote's Smoldering Ranseur",         type:"Spear",          range:"4m"},
+    {name:"Karnix's Netherblade",                  type:"Sword & Shield", range:"2.5m"},
+    {name:"Karnix's Netherbow",                    type:"Longbow",        range:"16m"},
+    {name:"Khanzaizin's Valorous Wand",            type:"Wand & Tome",    range:"17.5m"},
+    {name:"Kowazan's Sunflare Crossbows",          type:"Crossbow",       range:"12m"},
+    {name:"Kowazan's Twilight Daggers",            type:"Daggers",        range:"2.5m"},
+    {name:"Lequirus's Coveted Tome",               type:"Wand & Tome",    range:"14m"},
+    {name:"Lequirus's Wicked Thorns",              type:"Daggers",        range:"2.5m"},
+    {name:"Leviathan's Bladed Tendrils",           type:"Daggers",        range:"2.5m"},
+    {name:"Leviathan's Bloodstorm Longbow",        type:"Longbow",        range:"16m"},
+    {name:"Longbow of the Black Anvil",            type:"Longbow",        range:"19.2m"},
+    {name:"Longbow of the World Tree",             type:"Longbow",        range:"16m"},
+    {name:"Malakar's Energizing Crossbows",        type:"Crossbow",       range:"12m"},
+    {name:"Minzerok's Daggers of Crippling",       type:"Daggers",        range:"2.5m"},
+    {name:"Moonlight Echo Repeaters",              type:"Crossbow",       range:"14.4m"},
+    {name:"Morokai's Greatblade of Corruption",    type:"Greatsword",     range:"2.5m"},
+    {name:"Mystic Truestrike Longbow",             type:"Longbow",        range:"16m"},
+    {name:"Naru's Frenzied Greatblade",            type:"Greatsword",     range:"2.5m"},
+    {name:"Naru's Sawfang Spear",                  type:"Spear",          range:"4.4m"},
+    {name:"Nirma's Sword of Echoes",               type:"Sword & Shield", range:"2.75m"},
+    {name:"Overture of Eternal Salvation",         type:"Wand & Tome",    range:"18.2m"},
+    {name:"Peerless Obsidian Razors",              type:"Daggers",        range:"2.5m"},
+    {name:"Polearm of the Black Anvil",            type:"Spear",          range:"4.4m"},
+    {name:"Queen Bellandir's Hivemind Staff",      type:"Staff",          range:"19.2m"},
+    {name:"Queen Bellandir's Languishing Blade",   type:"Sword & Shield", range:"2.5m"},
+    {name:"Queen Bellandir's Serrated Spike",      type:"Spear",          range:"4m"},
+    {name:"Queen Bellandir's Toxic Spine Throwers",type:"Crossbow",       range:"13.2m"},
+    {name:"Ranseur of Murderous Glee",             type:"Spear",          range:"4.8m"},
+    {name:"Razorthorn Shredders",                  type:"Daggers",        range:"2.5m"},
+    {name:"Rex Chimaerus's Crossbows",             type:"Crossbow",       range:"12m"},
+    {name:"Rex Chimaerus's Fangs",                 type:"Daggers",        range:"2.5m"},
+    {name:"Rod of the Black Anvil",                type:"Wand & Tome",    range:"15.4m"},
+    {name:"Sacred Manuscript",                     type:"Wand & Tome",    range:"15.4m"},
+    {name:"Shaikal's Deepmind Longbow",            type:"Longbow",        range:"17.6m"},
+    {name:"Shaikal's Mindfire Scepter",            type:"Wand & Tome",    range:"15.4m"},
+    {name:"Shaikal's Mindveil Harpoon",            type:"Spear",          range:"4m"},
+    {name:"Skull Severing Spear",                  type:"Spear",          range:"4.4m"},
+    {name:"Spear of Unhinged Horror",              type:"Spear",          range:"4.8m"},
+    {name:"Staff of Enlightened Reform",           type:"Staff",          range:"17.6m"},
+    {name:"Staff of Lucid Light",                  type:"Staff",          range:"16m"},
+    {name:"Staff of the Umbramancer",              type:"Staff",          range:"17.6m"},
+    {name:"Stormbringer Crossbows",                type:"Crossbow",       range:"15.6m"},
+    {name:"Talus's Crystalline Staff",             type:"Staff",          range:"17.6m"},
+    {name:"Tevent's Arc of Wailing Death",         type:"Longbow",        range:"4%"},
+    {name:"Tevent's Fangs of Fury",                type:"Daggers",        range:"2.5m"},
+    {name:"Tevent's Grasp of Withering",           type:"Wand & Tome",    range:"16.8m"},
+    {name:"Tevent's Warblade of Despair",          type:"Greatsword",     range:"2.5m"},
+    {name:"Titanspine Longbow",                    type:"Longbow",        range:"16m"},
+    {name:"Tome of Proximate Remedy",              type:"Wand & Tome",    range:"7m"},
+    {name:"Toublek's Deathmark Longbow",           type:"Longbow",        range:"19.2m"},
+    {name:"Toublek's Shattering Quarterstaff",     type:"Staff",          range:"17.6m"},
+    {name:"Unrelenting Annihilation Crossbows",    type:"Crossbow",       range:"14.4m"},
+    {name:"Unshakeable Knight's Sword",            type:"Sword & Shield", range:"2.5m"},
+    {name:"Windsheer Spear",                       type:"Spear",          range:"4m"},
+  ];
+
+  // Build url helper
+  function weaponUrl(name) {
+    return 'Weapons/' + encodeURIComponent(name) + '.webp';
+  }
+
+  // ── Daily index ───────────────────────────────────────────────
+  const EPOCH = new Date('2026-01-01T00:00:00Z');
+
+  function getTodayStr() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function getYesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+
+  function getDayIndex() {
+    const now = new Date();
+    const days = Math.floor((now - EPOCH) / 86400000);
+    return ((days % WEAPONS.length) + WEAPONS.length) % WEAPONS.length;
+  }
+
+  function getTodayWeapon() { return WEAPONS[getDayIndex()]; }
+
+  // ── Persistence ───────────────────────────────────────────────
+  const SK = {
+    state: 'weapondle_state',
+    stats: 'weapondle_stats',
+    log:   'weapondle_log',
+    hints: 'weapondle_hints',
+  };
+
+  function loadState() {
+    try {
+      const s = JSON.parse(localStorage.getItem(SK.state));
+      return s && s.date === getTodayStr() ? s : null;
+    } catch { return null; }
+  }
+
+  function saveState(patch) {
+    const cur = loadState() || { date: getTodayStr(), guesses: [], gameOver: false, won: false };
+    localStorage.setItem(SK.state, JSON.stringify({ ...cur, ...patch, date: getTodayStr() }));
+  }
+
+  function loadStats() {
+    try { return JSON.parse(localStorage.getItem(SK.stats)) || { played: 0, wins: 0, streak: 0, maxStreak: 0, lastWonDate: null }; }
+    catch { return { played: 0, wins: 0, streak: 0, maxStreak: 0, lastWonDate: null }; }
+  }
+
+  function saveStats(s) { localStorage.setItem(SK.stats, JSON.stringify(s)); }
+
+  function getLog() {
+    try { return JSON.parse(localStorage.getItem(SK.log)) || []; }
+    catch { return []; }
+  }
+
+  function appendLog(entry) {
+    const log = getLog().filter(e => e.date !== entry.date);
+    log.unshift(entry);
+    localStorage.setItem(SK.log, JSON.stringify(log.slice(0, 365)));
+  }
+
+  // ── Blur ──────────────────────────────────────────────────────
+  function applyBlur() {
+    const canvas = document.getElementById('skill-canvas');
+    if (gameOver) { canvas.className = ''; canvas.style.filter = ''; return; }
+    const b = Math.max(0, 7 - guesses.length);
+    if (b <= 0) { canvas.className = ''; canvas.style.filter = ''; }
+    else { canvas.style.filter = 'blur(' + b + 'px) brightness(' + Math.min(1, 0.6 + guesses.length * 0.07) + ')'; }
+  }
+
+  // ── Game state ────────────────────────────────────────────────
+  let guesses = [];
+  let gameOver = false;
+  let stats = { played: 0, wins: 0, streak: 0 };
+  const MAX_GUESSES = 6;
+
+  function drawWeaponImage(url) {
+    const canvas = document.getElementById('skill-canvas');
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = url;
+  }
+
+  function init() {
+    const gs = document.getElementById('game-screen');
+    gs.style.display = 'flex';
+
+    stats = loadStats();
+
+    const todayStr = getTodayStr();
+    const yesterdayStr = getYesterdayStr();
+    if (stats.streak > 0 && stats.lastWonDate !== todayStr && stats.lastWonDate !== yesterdayStr) {
+      stats.streak = 0;
+      saveStats(stats);
+    }
+
+    updateStats();
+
+    const today = new Date();
+    document.getElementById('today-date').textContent =
+      today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).toUpperCase();
+
+    const weapon = getTodayWeapon();
+    const canvas = document.getElementById('skill-canvas');
+    drawWeaponImage(weaponUrl(weapon.name));
+
+    const state = loadState();
+    guesses = [];
+    gameOver = false;
+
+    if (state && state.guesses.length) {
+      state.guesses.forEach(g => {
+        const w = WEAPONS.find(x => x.name === g.name) || { name: g.name, type: '', range: '' };
+        guesses.push({ ...w, correct: g.correct });
+        addGuessRow(w, g.correct);
+      });
+
+      document.getElementById('attempt-count').textContent = guesses.length;
+
+      if (state.gameOver) {
+        gameOver = true;
+        showResult(state.won, state.guesses.length);
+      }
+
+      applyBlur();
+    } else {
+      applyBlur();
+    }
+
+    document.getElementById('guess-input').disabled = gameOver;
+    document.getElementById('btn-guess').disabled = gameOver;
+    document.getElementById('guess-input').focus();
+
+    hintPrefs = loadHintPrefs();
+    renderHints(false);
+    renderLog();
+    startCountdown();
+  }
+
+  function submitGuess() {
+    if (gameOver) return;
+    const input = document.getElementById('guess-input');
+    const val = input.value.trim();
+    if (!val) return;
+
+    const match = WEAPONS.find(w => w.name.toLowerCase() === val.toLowerCase());
+    if (!match) { shake(input); return; }
+
+    if (guesses.some(g => g.name.toLowerCase() === match.name.toLowerCase())) {
+      input.value = '';
+      return;
+    }
+
+    const correct = match.name.toLowerCase() === getTodayWeapon().name.toLowerCase();
+    guesses.push({ ...match, correct });
+
+    addGuessRow(match, correct);
+    document.getElementById('attempt-count').textContent = guesses.length;
+    input.value = '';
+    document.getElementById('autocomplete-list').classList.remove('open');
+
+    saveState({ guesses: guesses.map(g => ({ name: g.name, correct: g.correct })), gameOver: false });
+    renderHints(true);
+
+    if (correct) {
+      endGame(true);
+    } else if (guesses.length >= MAX_GUESSES) {
+      endGame(false);
+    } else {
+      applyBlur();
+    }
+  }
+
+  function addGuessRow(weapon, correct) {
+    const list = document.getElementById('guesses-list');
+    const row = document.createElement('div');
+    row.className = 'guess-row ' + (correct ? 'correct' : 'wrong');
+    const img = document.createElement('img');
+    img.src = weaponUrl(weapon.name);
+    img.alt = weapon.name;
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'guess-name';
+    nameSpan.textContent = weapon.name;
+    const icon = document.createElement('span');
+    icon.className = 'guess-result-icon';
+    icon.textContent = correct ? '✦' : '✕';
+    row.append(img, nameSpan, icon);
+    list.prepend(row);
+  }
+
+  function endGame(won) {
+    gameOver = true;
+    stats.played++;
+    if (won) {
+      stats.wins++;
+      stats.streak = stats.lastWonDate === getYesterdayStr() ? stats.streak + 1 : 1;
+      stats.lastWonDate = getTodayStr();
+      stats.maxStreak = Math.max(stats.maxStreak || 0, stats.streak);
+    } else {
+      stats.streak = 0;
+    }
+    saveStats(stats);
+    updateStats();
+
+    saveState({ guesses: guesses.map(g => ({ name: g.name, correct: g.correct })), gameOver: true, won });
+
+    appendLog({
+      date: getTodayStr(),
+      skill: getTodayWeapon().name,
+      won,
+      attempts: guesses.length,
+    });
+
+    document.getElementById('guess-input').disabled = true;
+    document.getElementById('btn-guess').disabled = true;
+
+    renderHints(false);
+    showResult(won, guesses.length);
+    renderLog();
+  }
+
+  function showResult(won, attempts) {
+    const banner = document.getElementById('result-banner');
+    banner.className = 'result-banner ' + (won ? 'win' : 'lose');
+    document.getElementById('result-title').textContent =
+      won ? (attempts === 1 ? '✦ Perfect!' : '✦ Correct!') : 'You lost, try again tomorrow!';
+    const weapon = getTodayWeapon();
+    document.getElementById('result-answer').innerHTML = won
+      ? 'Found <strong>' + weapon.name + '</strong> in <strong>' + attempts + '</strong> ' + (attempts === 1 ? 'attempt' : 'attempts') + '!'
+      : 'The weapon was <strong>' + weapon.name + '</strong>';
+    banner.style.display = 'block';
+  }
+
+  function updateStats() {
+    document.getElementById('stat-played').textContent = stats.played;
+    document.getElementById('stat-wins').textContent = stats.wins;
+    document.getElementById('stat-streak').textContent = stats.streak;
+    document.getElementById('stat-max-streak').textContent = stats.maxStreak || 0;
+  }
+
+  // ── Hints ─────────────────────────────────────────────────────
+  let hintPrefs = { type: false, range: false };
+
+  function loadHintPrefs() {
+    try { return JSON.parse(localStorage.getItem(SK.hints)) || { type: false, range: false }; }
+    catch { return { type: false, range: false }; }
+  }
+
+  function saveHintPrefs() { localStorage.setItem(SK.hints, JSON.stringify(hintPrefs)); }
+
+  function toggleHintPref(key) {
+    hintPrefs[key] = !hintPrefs[key];
+    saveHintPrefs();
+    renderHints(false);
+  }
+
+  const EYE_OPEN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+  const EYE_CLOSED = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+
+  function renderHints(animate) {
+    const w = getTodayWeapon();
+    updateBadge('type',  w.type,  3, animate);
+    updateBadge('range', w.range, 5, animate);
+  }
+
+  function updateBadge(key, value, threshold, animate) {
+    const badge  = document.getElementById('hb-' + key);
+    const valEl  = document.getElementById('hbv-' + key);
+    const btn    = document.getElementById('ht-' + key);
+    const enabled = hintPrefs[key];
+    const n = guesses.length;
+    const unlocked = n >= threshold || gameOver;
+
+    btn.innerHTML = enabled ? EYE_OPEN : EYE_CLOSED;
+    btn.style.color = enabled ? '' : 'var(--border)';
+    badge.style.opacity = '';
+
+    if (unlocked && enabled) {
+      valEl.textContent = value;
+      if (!badge.classList.contains('revealed')) {
+        badge.classList.add('revealed');
+        if (animate) { badge.classList.remove('hint-pop'); void badge.offsetWidth; badge.classList.add('hint-pop'); }
+      }
+    } else if (unlocked && !enabled) {
+      badge.classList.remove('revealed');
+      valEl.innerHTML = '<span style="color:var(--text-dim);font-size:14px;font-family:Crimson Pro,serif;">Hidden</span>';
+    } else {
+      badge.classList.remove('revealed');
+      const rem = threshold - n;
+      valEl.innerHTML = '<span style="color:var(--text);font-size:15px;font-family:Crimson Pro,serif;">After ' + rem + ' more guess' + (rem !== 1 ? 'es' : '') + '</span>';
+    }
+  }
+
+  // ── Countdown ─────────────────────────────────────────────────
+  let countdownInterval;
+
+  function startCountdown() {
+    if (countdownInterval) clearInterval(countdownInterval);
+    tick();
+    countdownInterval = setInterval(tick, 1000);
+  }
+
+  function tick() {
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const diff = midnight - now;
+
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const fmt = String(h).padStart(2,'0') + ':' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
+
+    const el1 = document.getElementById('countdown');
+    const el2 = document.getElementById('result-countdown');
+    if (el1) el1.textContent = fmt;
+    if (el2) el2.textContent = fmt;
+
+    if (diff < 1000) setTimeout(() => location.reload(), 1100);
+  }
+
+  // ── Log / history ─────────────────────────────────────────────
+  function renderLog() {
+    const log = getLog();
+    const badge = document.getElementById('log-count-badge');
+    const body = document.getElementById('log-body');
+    badge.textContent = log.length + ' game' + (log.length !== 1 ? 's' : '');
+
+    if (!log.length) {
+      body.innerHTML = '<div class="log-empty">No games recorded yet.</div>';
+      return;
+    }
+
+    body.innerHTML = log.map(e => {
+      const d = new Date(e.date + 'T12:00:00');
+      const label = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      const resClass = e.won ? 'win' : 'lose';
+      const resText = e.won ? '✦ ' + e.attempts + '/' + MAX_GUESSES : '✕ DNF';
+      return '<div class="log-entry"><div class="log-date">' + label + '</div><div class="log-skill">' + e.skill + '</div><div class="log-result ' + resClass + '">' + resText + '</div></div>';
+    }).join('');
+  }
+
+  function toggleLog() {
+    const body = document.getElementById('log-body');
+    const chevron = document.getElementById('log-chevron');
+    const open = body.classList.toggle('open');
+    chevron.classList.toggle('open', open);
+  }
+
+  // ── Autocomplete ──────────────────────────────────────────────
+  let acIndex = -1;
+
+  document.getElementById('guess-input').addEventListener('input', function() {
+    const val = this.value.trim().toLowerCase();
+    const list = document.getElementById('autocomplete-list');
+    acIndex = -1;
+    if (!val) { list.classList.remove('open'); return; }
+
+    const matches = WEAPONS.filter(w => w.name.toLowerCase().includes(val)).slice(0, 8);
+    if (!matches.length) { list.classList.remove('open'); return; }
+
+    list.innerHTML = matches.map((w, i) =>
+      '<div class="ac-item" data-index="' + i + '">' + w.name + '</div>'
+    ).join('');
+    list.classList.add('open');
+
+    list.querySelectorAll('.ac-item').forEach(item => {
+      item.addEventListener('mousedown', e => {
+        e.preventDefault();
+        document.getElementById('guess-input').value = item.textContent;
+        list.classList.remove('open');
+        submitGuess();
+      });
+    });
+  });
+
+  document.getElementById('guess-input').addEventListener('keydown', function(e) {
+    const list = document.getElementById('autocomplete-list');
+    const items = list.querySelectorAll('.ac-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      acIndex = Math.min(acIndex + 1, items.length - 1);
+      items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+      if (items[acIndex]) this.value = items[acIndex].textContent;
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      acIndex = Math.max(acIndex - 1, -1);
+      items.forEach((el, i) => el.classList.toggle('active', i === acIndex));
+      if (acIndex >= 0 && items[acIndex]) this.value = items[acIndex].textContent;
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      list.classList.remove('open');
+      submitGuess();
+    } else if (e.key === 'Escape') {
+      list.classList.remove('open');
+    }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.autocomplete-wrap')) {
+      document.getElementById('autocomplete-list').classList.remove('open');
+    }
+  });
+
+  document.getElementById('btn-guess').addEventListener('click', submitGuess);
+
+  function shake(el) {
+    el.classList.remove('shake');
+    void el.offsetWidth;
+    el.classList.add('shake');
+    el.addEventListener('animationend', () => el.classList.remove('shake'), { once: true });
+  }
+
+  init();
+</script>
+</body>
+</html>
