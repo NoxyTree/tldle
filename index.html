@@ -485,6 +485,102 @@ body {
   opacity: 0.15;
 }
 
+/* Promo section */
+.promo-section {
+  width: 100%;
+  max-width: 900px;
+  margin-top: 56px;
+  text-align: center;
+}
+
+.promo-heading {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.promo-heading::before,
+.promo-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-medium));
+}
+
+.promo-heading::after {
+  background: linear-gradient(90deg, var(--border-medium), transparent);
+}
+
+.promo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+@media (max-width: 480px) {
+  .promo-grid { grid-template-columns: 1fr; }
+}
+
+.promo-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 18px 24px;
+  background: var(--bg-layer1);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.3s ease;
+}
+
+.promo-card:hover {
+  border-color: var(--gold-dim);
+  background: var(--bg-layer2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2), 0 0 30px var(--gold-shadow);
+}
+
+.promo-card-name {
+  font-family: 'Cinzel', serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--gold-medium);
+  transition: color 0.3s ease;
+}
+
+.promo-card:hover .promo-card-name {
+  color: var(--gold-bright);
+}
+
+.promo-card-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+}
+
+.promo-card-arrow {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gold-dim);
+  margin-top: 4px;
+  display: inline-block;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.promo-card:hover .promo-card-arrow {
+  color: var(--gold-medium);
+  transform: translateX(4px);
+}
+
 /* Footer */
 .footer {
   margin-top: 80px;
@@ -645,6 +741,22 @@ body {
         <span class="btn-text">Play Now</span>
       </button>
     </a>
+  </div>
+
+  <div class="promo-section">
+    <div class="promo-heading">Also by the creator</div>
+    <div class="promo-grid">
+      <a class="promo-card" href="https://wargamestats.com/" target="_blank" rel="noopener">
+        <span class="promo-card-name">WargameStats</span>
+        <span class="promo-card-desc">Statistics &amp; tracking for wargames</span>
+        <span class="promo-card-arrow">Visit →</span>
+      </a>
+      <a class="promo-card" href="https://wargamefinder.com/" target="_blank" rel="noopener">
+        <span class="promo-card-name">WargameFinder</span>
+        <span class="promo-card-desc">Find your next favourite wargame</span>
+        <span class="promo-card-arrow">Visit →</span>
+      </a>
+    </div>
   </div>
 
   <footer class="footer">
